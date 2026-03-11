@@ -1,0 +1,10 @@
+com/dsw02/empleados/contract/EmpleadoReadContractIT.class
+com/dsw02/empleados/integration/EmpleadoReadIntegrationIT.class
+com/dsw02/empleados/integration/EmpleadoCreateIntegrationIT.class
+com/dsw02/empleados/integration/EmpleadoUpdateDeleteIntegrationIT.class
+com/dsw02/empleados/integration/SecurityCrudIntegrationIT.class
+com/dsw02/empleados/integration/BasePostgresIT.class
+com/dsw02/empleados/integration/OperabilityLoggingIntegrationIT.class
+com/dsw02/empleados/contract/EmpleadoUpdateDeleteContractIT.class
+com/dsw02/empleados/contract/EmpleadoCreateContractIT.class
+com/dsw02/empleados/integration/EmpleadoCreateConcurrencyIT.class

@@ -1,0 +1,183 @@
+openapi: 3.0.3
+info:
+  title: API CRUD de Empleados con Clave Compuesta
+  version: 1.0.0
+  description: CRUD de empleados con clave generada `EMP-` + consecutivo.
+servers:
+  - url: http://localhost:8080
+tags:
+  - name: Empleados
+security:
+  - basicAuth: []
+paths:
+  /api/empleados:
+    get:
+      tags: [Empleados]
+      summary: Listar empleados
+      operationId: listarEmpleados
+      responses:
+        '200':
+          description: Lista de empleados
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/EmpleadoResponse'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+    post:
+      tags: [Empleados]
+      summary: Registrar empleado (clave autogenerada)
+      operationId: crearEmpleado
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/EmpleadoCreateRequest'
+      responses:
+        '201':
+          description: Empleado creado
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/EmpleadoResponse'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+
+  /api/empleados/{clave}:
+    parameters:
+      - name: clave
+        in: path
+        required: true
+        schema:
+          type: string
+          pattern: '^EMP-[0-9]{6,}$'
+    get:
+      tags: [Empleados]
+      summary: Consultar empleado por clave compuesta
+      operationId: obtenerEmpleado
+      responses:
+        '200':
+          description: Empleado encontrado
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/EmpleadoResponse'
+        '404':
+          $ref: '#/components/responses/NotFound'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+    put:
+      tags: [Empleados]
+      summary: Actualizar empleado por clave compuesta
+      operationId: actualizarEmpleado
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/EmpleadoUpdateRequest'
+      responses:
+        '200':
+          description: Empleado actualizado
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/EmpleadoResponse'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '404':
+          $ref: '#/components/responses/NotFound'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+    delete:
+      tags: [Empleados]
+      summary: Eliminar empleado por clave compuesta
+      operationId: eliminarEmpleado
+      responses:
+        '204':
+          description: Empleado eliminado
+        '404':
+          $ref: '#/components/responses/NotFound'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+
+components:
+  securitySchemes:
+    basicAuth:
+      type: http
+      scheme: basic
+
+  schemas:
+    EmpleadoBase:
+      type: object
+      properties:
+        nombre:
+          type: string
+          minLength: 1
+          maxLength: 100
+        direccion:
+          type: string
+          minLength: 1
+          maxLength: 100
+        telefono:
+          type: string
+          minLength: 1
+          maxLength: 100
+      required: [nombre, direccion, telefono]
+
+    EmpleadoCreateRequest:
+      $ref: '#/components/schemas/EmpleadoBase'
+
+    EmpleadoUpdateRequest:
+      $ref: '#/components/schemas/EmpleadoBase'
+
+    EmpleadoResponse:
+      allOf:
+        - $ref: '#/components/schemas/EmpleadoBase'
+        - type: object
+          properties:
+            clave:
+              type: string
+              pattern: '^EMP-[0-9]{6,}$'
+            prefijo:
+              type: string
+              enum: ['EMP-']
+            consecutivo:
+              type: integer
+              format: int64
+              minimum: 1
+          required: [clave, prefijo, consecutivo]
+
+    ErrorResponse:
+      type: object
+      properties:
+        code:
+          type: string
+        message:
+          type: string
+      required: [code, message]
+
+  responses:
+    BadRequest:
+      description: Error de validación
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/ErrorResponse'
+    Unauthorized:
+      description: Credenciales inválidas o ausentes
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/ErrorResponse'
+    NotFound:
+      description: Empleado no encontrado
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/ErrorResponse'

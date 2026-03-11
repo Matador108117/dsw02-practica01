@@ -1,0 +1,10 @@
+/home/matador1081/semestre6/deploy/dsw02-practica01/src/test/java/com/dsw02/empleados/contract/EmpleadoCreateContractIT.java
+/home/matador1081/semestre6/deploy/dsw02-practica01/src/test/java/com/dsw02/empleados/contract/EmpleadoReadContractIT.java
+/home/matador1081/semestre6/deploy/dsw02-practica01/src/test/java/com/dsw02/empleados/contract/EmpleadoUpdateDeleteContractIT.java
+/home/matador1081/semestre6/deploy/dsw02-practica01/src/test/java/com/dsw02/empleados/integration/BasePostgresIT.java
+/home/matador1081/semestre6/deploy/dsw02-practica01/src/test/java/com/dsw02/empleados/integration/EmpleadoCreateConcurrencyIT.java
+/home/matador1081/semestre6/deploy/dsw02-practica01/src/test/java/com/dsw02/empleados/integration/EmpleadoCreateIntegrationIT.java
+/home/matador1081/semestre6/deploy/dsw02-practica01/src/test/java/com/dsw02/empleados/integration/EmpleadoReadIntegrationIT.java
+/home/matador1081/semestre6/deploy/dsw02-practica01/src/test/java/com/dsw02/empleados/integration/EmpleadoUpdateDeleteIntegrationIT.java
+/home/matador1081/semestre6/deploy/dsw02-practica01/src/test/java/com/dsw02/empleados/integration/OperabilityLoggingIntegrationIT.java
+/home/matador1081/semestre6/deploy/dsw02-practica01/src/test/java/com/dsw02/empleados/integration/SecurityCrudIntegrationIT.java

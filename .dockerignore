@@ -1,0 +1,30 @@
+# Docker context optimization
+.git/
+.gitignore
+.dockerignore
+
+# Build outputs
+target/
+build/
+dist/
+out/
+coverage/
+
+# Dependencies and caches
+node_modules/
+.m2/
+
+# Environment and logs
+.env*
+*.log
+
+# IDE/OS
+.vscode/
+.idea/
+.DS_Store
+Thumbs.db
+*.tmp
+*.swp
+
+# Docker files
+Dockerfile*
