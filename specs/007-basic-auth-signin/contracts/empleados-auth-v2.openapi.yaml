@@ -1,0 +1,529 @@
+openapi: 3.0.0
+
+info:
+  title: Empleados API v2 - HTTP Basic Authentication
+  version: 2.0.0
+  description: |
+    Estateful API for managing employee records with HTTP Basic Authentication.
+    
+    All endpoints require HTTP Basic authentication:
+    - **Username**: Employee email (e.g., `juan@example.com`)
+    - **Password**: Employee password (plaintext in request; hashed in database)
+    
+    **Authentication Scheme**: HTTP Basic (RFC 7617)
+    **Realm**: `empleados-api`
+    **Encryption**: HTTPS (required in production; HTTP allowed for local dev)
+  
+  contact:
+    name: DSW02 Development Team
+    email: support@dsw02.local
+  
+  x-logo:
+    url: https://dsw02.example.com/logo.png
+
+servers:
+  - url: http://localhost:8080
+    description: Local development server (HTTP allowed for testing only)
+    variables:
+      port:
+        default: '8080'
+  
+  - url: https://empleados.dsw02.example.com
+    description: Production server (HTTPS required)
+
+security:
+  - basicAuth: []
+
+paths:
+  /api/v2/empleados:
+    post:
+      summary: Create a new employee (ADMIN only)
+      operationId: createEmpleado
+      tags:
+        - Employees
+      security:
+        - basicAuth: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/EmpleadoCreateRequest'
+            examples:
+              admin_creates_user:
+                summary: Admin creates a new USER employee
+                value:
+                  nombre: Juan
+                  apellido: Pérez García
+                  correo_electronico: juan.perez@example.com
+                  rol: USER
+      responses:
+        '201':
+          description: Employee created successfully
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Empleado'
+              examples:
+                success:
+                  value:
+                    id_empleado: 42
+                    nombre: Juan
+                    apellido: Pérez García
+                    correo_electronico: juan.perez@example.com
+                    rol: USER
+                    activo: true
+                    fecha_creacion: "2026-03-17T10:30:00Z"
+        '400':
+          description: Invalid request body (validation error)
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '401':
+          description: Unauthorized - Missing or invalid credentials
+          headers:
+            WWW-Authenticate:
+              schema:
+                type: string
+              description: HTTP Basic realm challenge
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+              examples:
+                missing_auth:
+                  value:
+                    error: Unauthorized
+                    message: Authorization header missing
+        '403':
+          description: Forbidden - User lacks ADMIN role
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+              examples:
+                insufficient_role:
+                  value:
+                    error: Forbidden
+                    message: USER role cannot create employees (ADMIN required)
+        '429':
+          description: Rate limit exceeded (brute-force protection)
+          headers:
+            Retry-After:
+              schema:
+                type: integer
+              description: Seconds to wait before retrying
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+              examples:
+                rate_limited:
+                  value:
+                    error: TooManyRequests
+                    message: Rate limit exceeded for account juan@example.com
+                    retry_after_seconds: 300
+        '503':
+          description: Service unavailable (auth service failure)
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+              examples:
+                service_down:
+                  value:
+                    error: ServiceUnavailable
+                    message: Authentication service temporarily unavailable
+    
+    get:
+      summary: List all employees (USER and ADMIN)
+      operationId: listEmpleados
+      tags:
+        - Employees
+      security:
+        - basicAuth: []
+      parameters:
+        - name: page
+          in: query
+          required: false
+          schema:
+            type: integer
+            default: 0
+        - name: size
+          in: query
+          required: false
+          schema:
+            type: integer
+            default: 20
+      responses:
+        '200':
+          description: List of employees (paginated)
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/EmpleadoPage'
+              examples:
+                success:
+                  value:
+                    content:
+                      - id_empleado: 1
+                        nombre: María
+                        apellido: García López
+                        correo_electronico: maria@example.com
+                        rol: ADMIN
+                        activo: true
+                        fecha_creacion: "2026-01-01T08:00:00Z"
+                    page: 0
+                    size: 20
+                    total_elements: 42
+                    total_pages: 3
+        '401':
+          $ref: '#/components/responses/UnauthorizedError'
+        '429':
+          $ref: '#/components/responses/RateLimitError'
+        '503':
+          $ref: '#/components/responses/ServiceUnavailableError'
+
+  /api/v2/empleados/{id}:
+    get:
+      summary: Get a single employee by ID
+      operationId: getEmpleadoById
+      tags:
+        - Employees
+      security:
+        - basicAuth: []
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: integer
+      responses:
+        '200':
+          description: Employee found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Empleado'
+        '401':
+          $ref: '#/components/responses/UnauthorizedError'
+        '404':
+          description: Employee not found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '429':
+          $ref: '#/components/responses/RateLimitError'
+        '503':
+          $ref: '#/components/responses/ServiceUnavailableError'
+
+components:
+  securitySchemes:
+    basicAuth:
+      type: http
+      scheme: basic
+      description: |
+        HTTP Basic Authentication per RFC 7617
+        
+        **Format**: `Authorization: Basic {Base64(email:password)}`
+        
+        **Example**:
+        - Email: `juan@example.com`
+        - Password: `MySecurePassword123`
+        - Base64 encoded: `anVhbkBleGFtcGxlLmNvbTpNeVNlY3VyZVBhc3N3b3JkMTIz`
+        - Header: `Authorization: Basic anVhbkBleGFtcGxlLmNvbTpNeVNlY3VyZVBhc3N3b3JkMTIz`
+        
+        **Usage in cURL**:
+        ```bash
+        curl -u juan@example.com:MySecurePassword123 http://localhost:8080/api/v2/empleados
+        ```
+        
+        **Usage in JavaScript**:
+        ```javascript
+        const credentials = 'juan@example.com:MySecurePassword123';
+        const encoded = btoa(credentials);
+        fetch('/api/v2/empleados', {
+          headers: {
+            'Authorization': 'Basic ' + encoded
+          }
+        });
+        ```
+
+  schemas:
+    Empleado:
+      type: object
+      description: Employee entity with roles (USER, ADMIN)
+      required:
+        - id_empleado
+        - nombre
+        - apellido
+        - correo_electronico
+        - rol
+        - activo
+      properties:
+        id_empleado:
+          type: integer
+          format: int64
+          description: Unique employee identifier
+          example: 42
+        nombre:
+          type: string
+          minLength: 1
+          maxLength: 100
+          description: Employee first name
+          example: "Juan"
+        apellido:
+          type: string
+          minLength: 1
+          maxLength: 100
+          description: Employee last name
+          example: "Pérez García"
+        correo_electronico:
+          type: string
+          format: email
+          description: Employee email (unique, case-insensitive, used for HTTP Basic auth username)
+          example: "juan.perez@example.com"
+        rol:
+          type: string
+          enum:
+            - USER
+            - ADMIN
+          description: |
+            Employee role determines authorization:
+            - **USER**: Read-only access to employee list (GET /api/v2/empleados)
+            - **ADMIN**: Full CRUD permissions (GET, POST, PUT, DELETE)
+          example: "USER"
+        activo:
+          type: boolean
+          description: Active status (must be true to authenticate)
+          example: true
+        fecha_creacion:
+          type: string
+          format: date-time
+          description: Account creation timestamp
+          example: "2026-03-17T10:30:00Z"
+
+    EmpleadoCreateRequest:
+      type: object
+      description: Request body for creating a new employee
+      required:
+        - nombre
+        - apellido
+        - correo_electronico
+        - rol
+      properties:
+        nombre:
+          type: string
+          minLength: 1
+          maxLength: 100
+          example: "Juan"
+        apellido:
+          type: string
+          minLength: 1
+          maxLength: 100
+          example: "Pérez García"
+        correo_electronico:
+          type: string
+          format: email
+          example: "juan.perez@example.com"
+        rol:
+          type: string
+          enum:
+            - USER
+            - ADMIN
+          example: "USER"
+
+    EmpleadoPage:
+      type: object
+      description: Paginated list of employees
+      properties:
+        content:
+          type: array
+          items:
+            $ref: '#/components/schemas/Empleado'
+          description: Current page of employees
+        page:
+          type: integer
+          description: Current page number (0-indexed)
+          example: 0
+        size:
+          type: integer
+          description: Number of items per page
+          example: 20
+        total_elements:
+          type: integer
+          description: Total number of employees
+          example: 42
+        total_pages:
+          type: integer
+          description: Total number of pages
+          example: 3
+
+    ErrorResponse:
+      type: object
+      description: Standard error response
+      required:
+        - error
+        - message
+      properties:
+        error:
+          type: string
+          description: Error type (e.g., Unauthorized, RateLimitExceeded)
+          example: "Unauthorized"
+        message:
+          type: string
+          description: Human-readable error message
+          example: "Invalid credentials"
+        retry_after_seconds:
+          type: integer
+          description: (Optional) Seconds to wait before retrying (for 429 responses)
+          example: 300
+        timestamp:
+          type: string
+          format: date-time
+          description: (Optional) Error timestamp
+          example: "2026-03-17T10:30:15Z"
+
+  responses:
+    UnauthorizedError:
+      description: Unauthorized - Missing or invalid credentials
+      headers:
+        WWW-Authenticate:
+          schema:
+            type: string
+          description: HTTP Basic realm challenge
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/ErrorResponse'
+          examples:
+            missing_credentials:
+              value:
+                error: Unauthorized
+                message: Authorization header missing
+            invalid_credentials:
+              value:
+                error: Unauthorized
+                message: Invalid email or password
+            invalid_base64:
+              value:
+                error: Unauthorized
+                message: Authorization header must contain valid Base64
+
+    RateLimitError:
+      description: Rate limit exceeded (too many failed login attempts)
+      headers:
+        Retry-After:
+          schema:
+            type: integer
+          description: Seconds to wait before retrying
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/ErrorResponse'
+          examples:
+            rate_limited:
+              value:
+                error: TooManyRequests
+                message: Too many failed login attempts. Please try again later.
+                retry_after_seconds: 300
+
+    ServiceUnavailableError:
+      description: Service unavailable (auth service failure)
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/ErrorResponse'
+          examples:
+            service_down:
+              value:
+                error: ServiceUnavailable
+                message: Authentication service temporarily unavailable. Please try again later.
+
+x-scenarios:
+  - name: "Happy Path: Employee Lists Other Employees"
+    description: A USER employee successfully authenticates and lists all employees
+    steps:
+      - description: Employee provides credentials via HTTP Basic header
+        request:
+          method: GET
+          path: /api/v2/empleados
+          headers:
+            Authorization: "Basic anVhbkBleGFtcGxlLmNvbTpNeVNlY3VyZVBhc3N3b3JkMTIz"
+        response:
+          status: 200
+          body:
+            content:
+              - id_empleado: 1
+                nombre: María
+                apellido: García
+                correo_electronico: maria@example.com
+                rol: ADMIN
+                activo: true
+              - id_empleado: 42
+                nombre: Juan
+                apellido: Pérez
+                correo_electronico: juan@example.com
+                rol: USER
+                activo: true
+
+  - name: "Error Path: Missing Authorization Header"
+    description: Request without credentials returns 401 with WWW-Authenticate challenge
+    steps:
+      - description: Client omits Authorization header
+        request:
+          method: GET
+          path: /api/v2/empleados
+        response:
+          status: 401
+          headers:
+            WWW-Authenticate: 'Basic realm="empleados-api"'
+          body:
+            error: Unauthorized
+            message: Authorization header missing
+
+  - name: "Error Path: Invalid Credentials (5+ Attempts → Rate Limited)"
+    description: Attacker exhausts rate limit by attempting 5 invalid logins in 1 minute
+    steps:
+      - description: "Attempt 1: Invalid password"
+        request:
+          method: GET
+          path: /api/v2/empleados
+          headers:
+            Authorization: "Basic anVhbkBleGFtcGxlLmNvbTpXcm9uZ1Bhc3MxMjM="
+        response:
+          status: 401
+      - description: "Attempt 2–4: Repeated invalid password"
+        response:
+          status: 401
+      - description: "Attempt 5: 5th invalid password within 1 minute → Rate limiter activated"
+        request:
+          method: GET
+          path: /api/v2/empleados
+          headers:
+            Authorization: "Basic anVhbkBleGFtcGxlLmNvbTpBbm90aGVyV3JvbmdQYXNz"
+        response:
+          status: 429
+          headers:
+            Retry-After: "300"
+          body:
+            error: TooManyRequests
+            message: Rate limit exceeded
+            retry_after_seconds: 300
+
+  - name: "Error Path: Service Failure (Auth Service Down)"
+    description: Authentication service failure returns 503 without attempting auth
+    steps:
+      - description: Service is unavailable (database down, etc.)
+        request:
+          method: GET
+          path: /api/v2/empleados
+          headers:
+            Authorization: "Basic anVhbkBleGFtcGxlLmNvbTpNeVNlY3VyZVBhc3N3b3JkMTIz"
+        response:
+          status: 503
+          body:
+            error: ServiceUnavailable
+            message: Authentication service temporarily unavailable
