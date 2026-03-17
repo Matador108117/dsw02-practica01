@@ -15,6 +15,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 
 import com.dsw02.empleados.controller.dto.EmpleadoDtos.EmpleadoCreateRequest;
+import com.dsw02.empleados.model.Rol;
 import com.dsw02.empleados.service.EmpleadoService;
 
 @SpringBootTest
@@ -35,7 +36,8 @@ class EmpleadoCreateConcurrencyIT extends BasePostgresIT {
                 "Direccion " + index,
                 "55000000" + index,
                 "user" + index + "@example.com",
-                "Password!" + index
+                "Password!" + index,
+                Rol.USER
             )).clave());
         }
 

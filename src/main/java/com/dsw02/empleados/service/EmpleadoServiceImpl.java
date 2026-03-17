@@ -4,6 +4,7 @@ import java.util.List;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -12,6 +13,7 @@ import com.dsw02.empleados.controller.dto.EmpleadoDtos.EmpleadoResponse;
 import com.dsw02.empleados.controller.dto.EmpleadoDtos.EmpleadoUpdateRequest;
 import com.dsw02.empleados.model.ClaveEmpleadoId;
 import com.dsw02.empleados.model.Empleado;
+import com.dsw02.empleados.model.Rol;
 import com.dsw02.empleados.repository.EmpleadoRepository;
 
 @Service
@@ -22,15 +24,18 @@ public class EmpleadoServiceImpl implements EmpleadoService {
     private final EmpleadoRepository repository;
     private final ClaveEmpleadoFormatter formatter;
     private final ClaveEmpleadoParser parser;
+    private final PasswordEncoder passwordEncoder;
 
     public EmpleadoServiceImpl(
         EmpleadoRepository repository,
         ClaveEmpleadoFormatter formatter,
-        ClaveEmpleadoParser parser
+        ClaveEmpleadoParser parser,
+        PasswordEncoder passwordEncoder
     ) {
         this.repository = repository;
         this.formatter = formatter;
         this.parser = parser;
+        this.passwordEncoder = passwordEncoder;
     }
 
     @Override
@@ -44,8 +49,18 @@ public class EmpleadoServiceImpl implements EmpleadoService {
         empleado.setNombre(request.nombre().trim());
         empleado.setDireccion(request.direccion().trim());
         empleado.setTelefono(request.telefono().trim());
-        empleado.setCorreoElectronico(request.correoElectronico().trim());
-        empleado.setContrasena(request.contrasena());
+        
+        // Normalize email to lowercase for case-insensitive uniqueness
+        String normalizedEmail = request.correoElectronico().trim().toLowerCase();
+        empleado.setCorreoElectronico(normalizedEmail);
+        
+        // Hash password and never store plaintext
+        String hashedPassword = passwordEncoder.encode(request.contrasena());
+        empleado.setContrasenaHash(hashedPassword);
+        
+        // Set role (default to USER if not provided)
+        empleado.setRol(request.rol() != null ? request.rol() : Rol.USER);
+        empleado.setActivo(true);
 
         Empleado saved = repository.save(empleado);
         EmpleadoResponse response = toResponse(saved);
@@ -74,11 +89,29 @@ public class EmpleadoServiceImpl implements EmpleadoService {
         ClaveEmpleadoId id = parser.parse(clave);
         Empleado empleado = repository.findById(id).orElseThrow(() -> new EmpleadoNotFoundException(clave));
 
-        empleado.setNombre(request.nombre().trim());
-        empleado.setDireccion(request.direccion().trim());
-        empleado.setTelefono(request.telefono().trim());
-        empleado.setCorreoElectronico(request.correoElectronico().trim());
-        empleado.setContrasena(request.contrasena());
+        if (request.nombre() != null) {
+            empleado.setNombre(request.nombre().trim());
+        }
+        if (request.direccion() != null) {
+            empleado.setDireccion(request.direccion().trim());
+        }
+        if (request.telefono() != null) {
+            empleado.setTelefono(request.telefono().trim());
+        }
+        if (request.correoElectronico() != null) {
+            empleado.setCorreoElectronico(request.correoElectronico().trim().toLowerCase());
+        }
+        // Only update password if provided
+        if (request.contrasena() != null && !request.contrasena().isEmpty()) {
+            String hashedPassword = passwordEncoder.encode(request.contrasena());
+            empleado.setContrasenaHash(hashedPassword);
+        }
+        if (request.rol() != null) {
+            empleado.setRol(request.rol());
+        }
+        if (request.activo() != null) {
+            empleado.setActivo(request.activo());
+        }
 
         Empleado saved = repository.save(empleado);
         EmpleadoResponse response = toResponse(saved);
@@ -105,7 +138,9 @@ public class EmpleadoServiceImpl implements EmpleadoService {
             empleado.getNombre(),
             empleado.getDireccion(),
             empleado.getTelefono(),
-            empleado.getCorreoElectronico()
+            empleado.getCorreoElectronico(),
+            empleado.getRol().name(),
+            empleado.getActivo()
         );
     }
 }
