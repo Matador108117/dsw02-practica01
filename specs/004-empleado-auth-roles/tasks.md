@@ -30,25 +30,25 @@
 
 **⚠️ CRITICAL**: No user story work can begin until this phase is complete.
 
-- [ ] T005 Crear migracion incremental hash-only (sin sobrescribir V3 existente) para transicionar `contrasena` legacy -> `contrasena_hash` y validar integridad post-migracion in src/main/resources/db/migration/V4__migrate_contrasena_to_contrasena_hash.sql
-- [ ] T006 [P] Crear migracion de unicidad case-insensitive por correo in src/main/resources/db/migration/V5__add_unique_lower_correo_electronico.sql
-- [ ] T007 [P] Crear migracion de tabla de intentos de autenticacion in src/main/resources/db/migration/V6__create_auth_attempt_table.sql
-- [ ] T008 Crear migracion de `ApiVersionSupportPolicy` con `release_v2_at_utc` y `sunset_at_utc` in src/main/resources/db/migration/V7__create_api_version_support_policy.sql
-- [ ] T009 [P] Crear migracion idempotente de backfill de rol `USER` para registros existentes in src/main/resources/db/migration/V8__backfill_default_user_role.sql
-- [ ] T010 [P] Implementar entidad AuthAttempt in src/main/java/com/dsw02/empleados/model/AuthAttempt.java
-- [ ] T011 [P] Implementar entidad ApiVersionSupportPolicy in src/main/java/com/dsw02/empleados/model/ApiVersionSupportPolicy.java
-- [ ] T012 [P] Crear AuthAttemptRepository in src/main/java/com/dsw02/empleados/repository/AuthAttemptRepository.java
-- [ ] T013 [P] Crear ApiVersionSupportPolicyRepository in src/main/java/com/dsw02/empleados/repository/ApiVersionSupportPolicyRepository.java
-- [ ] T014 Actualizar entidad Empleado para persistencia hash-only in src/main/java/com/dsw02/empleados/model/Empleado.java
-- [ ] T015 Ajustar DTOs para `contrasena` solo de entrada y salida sin credencial in src/main/java/com/dsw02/empleados/controller/dto/EmpleadoDtos.java
-- [ ] T016 Implementar UserDetailsService persistente por correo in src/main/java/com/dsw02/empleados/service/EmpleadoUserDetailsService.java
-- [ ] T017 Implementar PasswordEncoder y AuthenticationProvider in src/main/java/com/dsw02/empleados/config/SecurityConfig.java
-- [ ] T018 [P] Implementar AuthAttemptService (5/15 + bloqueo 15) in src/main/java/com/dsw02/empleados/service/AuthAttemptService.java
-- [ ] T019 [P] Implementar ApiVersionSupportPolicyService con logica UTC/sunset in src/main/java/com/dsw02/empleados/service/ApiVersionSupportPolicyService.java
-- [ ] T020 Implementar bootstrap `ADMIN` controlado (secreto en variable segura, unico bootstrap, forzar cambio en primer login, registrar evento) in src/main/java/com/dsw02/empleados/config/SecurityConfig.java
-- [ ] T021 [P] Agregar validacion automatizada de naming convention de ramas (`feature/*`, `fix/*`, `chore/*`) in .github/workflows/ci.yml
-- [ ] T022 [P] Crear template obligatorio de PR con trazabilidad task->branch->PR y checklist constitucional in .github/pull_request_template.md
-- [ ] T023 [P] Agregar verificacion de atomicidad/no mezcla de concerns en pipeline de revision in .github/workflows/ci.yml
+- [x] T005 Crear migracion incremental hash-only (sin sobrescribir V3 existente) para transicionar `contrasena` legacy -> `contrasena_hash` y validar integridad post-migracion in src/main/resources/db/migration/V4__migrate_contrasena_to_contrasena_hash.sql
+- [x] T006 [P] Crear migracion de unicidad case-insensitive por correo in src/main/resources/db/migration/V5__add_unique_lower_correo_electronico.sql
+- [x] T007 [P] Crear migracion de tabla de intentos de autenticacion in src/main/resources/db/migration/V6__create_auth_attempt_table.sql
+- [x] T008 Crear migracion de `ApiVersionSupportPolicy` con `release_v2_at_utc` y `sunset_at_utc` in src/main/resources/db/migration/V7__create_api_version_support_policy.sql
+- [x] T009 [P] Crear migracion idempotente de backfill de rol `USER` para registros existentes in src/main/resources/db/migration/V8__backfill_default_user_role.sql
+- [x] T010 [P] Implementar entidad AuthAttempt in src/main/java/com/dsw02/empleados/model/AuthAttempt.java
+- [x] T011 [P] Implementar entidad ApiVersionSupportPolicy in src/main/java/com/dsw02/empleados/model/ApiVersionSupportPolicy.java
+- [x] T012 [P] Crear AuthAttemptRepository in src/main/java/com/dsw02/empleados/repository/AuthAttemptRepository.java
+- [x] T013 [P] Crear ApiVersionSupportPolicyRepository in src/main/java/com/dsw02/empleados/repository/ApiVersionSupportPolicyRepository.java
+- [x] T014 Actualizar entidad Empleado para persistencia hash-only in src/main/java/com/dsw02/empleados/model/Empleado.java
+- [x] T015 Ajustar DTOs para `contrasena` solo de entrada y salida sin credencial in src/main/java/com/dsw02/empleados/controller/dto/EmpleadoDtos.java
+- [x] T016 Implementar UserDetailsService persistente por correo in src/main/java/com/dsw02/empleados/service/EmpleadoUserDetailsService.java
+- [x] T017 Implementar PasswordEncoder y AuthenticationProvider in src/main/java/com/dsw02/empleados/config/SecurityConfig.java
+- [x] T018 [P] Implementar AuthAttemptService (5/15 + bloqueo 15) in src/main/java/com/dsw02/empleados/service/AuthAttemptService.java
+- [x] T019 [P] Implementar ApiVersionSupportPolicyService con logica UTC/sunset in src/main/java/com/dsw02/empleados/service/ApiVersionSupportPolicyService.java
+- [x] T020 Implementar bootstrap `ADMIN` controlado (secreto en variable segura, unico bootstrap, forzar cambio en primer login, registrar evento) in src/main/java/com/dsw02/empleados/config/SecurityConfig.java
+- [x] T021 [P] Agregar validacion automatizada de naming convention de ramas (`feature/*`, `fix/*`, `chore/*`) in .github/workflows/ci.yml
+- [x] T022 [P] Crear template obligatorio de PR con trazabilidad task->branch->PR y checklist constitucional in .github/pull_request_template.md
+- [x] T023 [P] Agregar verificacion de atomicidad/no mezcla de concerns en pipeline de revision in .github/workflows/ci.yml
 
 **Checkpoint**: Foundation ready - user story implementation can now begin.
 

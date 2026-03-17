@@ -5,6 +5,8 @@ import java.time.LocalDateTime;
 import jakarta.persistence.Column;
 import jakarta.persistence.EmbeddedId;
 import jakarta.persistence.Entity;
+import jakarta.persistence.EnumType;
+import jakarta.persistence.Enumerated;
 import jakarta.persistence.PrePersist;
 import jakarta.persistence.PreUpdate;
 import jakarta.persistence.Table;
@@ -25,11 +27,18 @@ public class Empleado {
     @Column(name = "telefono", nullable = false, length = 100)
     private String telefono;
 
-    @Column(name = "correo_electronico", nullable = false, length = 150)
+    @Column(name = "correo_electronico", nullable = false, length = 150, unique = true)
     private String correoElectronico;
 
-    @Column(name = "contrasena", nullable = false, length = 255)
-    private String contrasena;
+    @Column(name = "contrasena_hash", nullable = false, length = 255)
+    private String contrasenaHash;
+
+    @Enumerated(EnumType.STRING)
+    @Column(name = "rol", nullable = false, length = 20)
+    private Rol rol = Rol.USER;
+
+    @Column(name = "activo", nullable = false)
+    private Boolean activo = true;
 
     @Column(name = "created_at")
     private LocalDateTime createdAt;
@@ -77,12 +86,28 @@ public class Empleado {
         this.correoElectronico = correoElectronico;
     }
 
-    public String getContrasena() {
-        return contrasena;
+    public String getContrasenaHash() {
+        return contrasenaHash;
     }
 
-    public void setContrasena(String contrasena) {
-        this.contrasena = contrasena;
+    public void setContrasenaHash(String contrasenaHash) {
+        this.contrasenaHash = contrasenaHash;
+    }
+
+    public Rol getRol() {
+        return rol;
+    }
+
+    public void setRol(Rol rol) {
+        this.rol = rol;
+    }
+
+    public Boolean getActivo() {
+        return activo;
+    }
+
+    public void setActivo(Boolean activo) {
+        this.activo = activo;
     }
 
     public LocalDateTime getCreatedAt() {
