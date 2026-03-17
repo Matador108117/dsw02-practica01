@@ -1,19 +1,18 @@
 <!--
 Sync Impact Report
-- Version change: 3.0.0 -> 3.1.0
+- Version change: 3.1.0 -> 3.2.0
 - Modified principles:
-	- II. Email/Password Authentication and Role Authorization (HTTP Basic mandatory + credential validation flow clarified)
-	- III. PostgreSQL + Docker by Default (credential storage wording clarified for hash-only persistence)
-- Added sections:
 	- None
+- Added sections:
+	- IX. Automated Agent Workflow Discipline
 - Removed sections:
 	- None
 - Templates requiring updates:
-	- ✅ updated: .specify/templates/plan-template.md
-	- ✅ updated: .specify/templates/spec-template.md
-	- ✅ updated: .specify/templates/tasks-template.md
-	- ⚠ pending: .specify/templates/commands/*.md (directory not present)
-	- ✅ verified: runtime guidance docs (README.md, docs/quickstart.md not present)
+	- ✅ verified: .specify/templates/plan-template.md (no changes needed)
+	- ✅ verified: .specify/templates/spec-template.md (no changes needed)
+	- ✅ verified: .specify/templates/tasks-template.md (no changes needed)
+	- ✅ verified: .specify/templates/commands/*.md (directory not present)
+	- ✅ verified: runtime guidance docs
 - Follow-up TODOs:
 	- None
 -->
@@ -92,6 +91,19 @@ compliance. Direct commits to the main branch are forbidden except for approved 
 automation. Rationale: disciplined Git usage improves traceability, review quality,
 and release safety.
 
+### IX. Automated Agent Workflow Discipline
+Automated agents (implementation/build/test agents) MUST work on the current branch as
+checked out unless the user explicitly instructs the agent to create or switch branches.
+Agents MUST NOT create feature branches or checkout different branches without explicit
+user instruction. When executing multi-phase implementations (such as feature specs with
+Phase 1, 2, 3 structure), agents MUST complete each assigned phase to completion despite
+transient repository changes (such as file modifications, new commits by other processes,
+or CI/CD pipeline updates). Agents MUST NOT abort or halt execution without explicit
+user instruction to do so. Agents MUST document progress, blockers, and recovery actions
+in visible task tracking and summaries before continuing. Rationale: predictable agent
+behavior ensures that implementation phases complete reliably even in multi-process
+environments, and explicit instruction prevents accidental task abandonment.
+
 ## Technical Constraints
 
 - Runtime MUST be Java 17.
@@ -140,14 +152,22 @@ and release safety.
 
 ## Governance
 
-This constitution overrides conflicting local conventions for backend development.
-Amendments require: (1) documented proposal, (2) impact summary on templates/process,
-and (3) version update under semantic versioning.
+This constitution overrides conflicting local conventions for backend development
+and automated development workflows. Amendments require: (1) documented proposal,
+(2) impact summary on templates/process, and (3) version update under semantic versioning.
 
 Versioning policy:
 - MAJOR: incompatible governance or principle removals/redefinitions.
 - MINOR: new principle/section or materially expanded mandatory guidance.
 - PATCH: wording clarifications and non-semantic refinements.
+
+Agent Compliance:
+- Automated implementation agents MUST adhere to Principle IX (Automated Agent Workflow
+  Discipline) when executing feature implementations tied to spec identifiers.
+- Violations of Principle IX (early abort, unasked branch creation, incomplete phases)
+  MUST be corrected by explicit user instruction or agent re-initialization.
+- Implementation progress MUST be tracked and visible to users via task lists or
+  summary reports before phase transitions.
 
 Compliance review policy:
 - Every feature plan MUST pass a constitution gate before implementation starts.

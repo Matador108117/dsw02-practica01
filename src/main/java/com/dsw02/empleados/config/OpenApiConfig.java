@@ -16,14 +16,17 @@ public class OpenApiConfig {
         final String securitySchemeName = "basicAuth";
         return new OpenAPI()
             .info(new Info()
-                .title("API CRUD de Empleados con Clave Compuesta")
-                .version("1.0.0")
-                .description("CRUD de empleados con clave generada EMP- + consecutivo"))
+                .title("API CRUD de Empleados con Autenticacion y Roles")
+                .version("2.0.0")
+                .description("CRUD de empleados con HTTP Basic Auth (correo_electronico:contrasena), \n" +
+                    "autorizacion por rol (ADMIN=CRUD, USER=Read-only), bloqueo por intentos fallidos, \n" +
+                    "y versionado v1 (deprecated) / v2 (active) con sunset enforced en v1 post-UTC."))
             .addSecurityItem(new SecurityRequirement().addList(securitySchemeName))
             .components(new Components()
                 .addSecuritySchemes(securitySchemeName, new SecurityScheme()
                     .name(securitySchemeName)
                     .type(SecurityScheme.Type.HTTP)
-                    .scheme("basic")));
+                    .scheme("basic")
+                    .description("HTTP Basic Authentication using correo_electronico as username")));
     }
 }

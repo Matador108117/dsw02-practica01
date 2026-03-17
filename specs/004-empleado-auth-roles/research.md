@@ -18,7 +18,7 @@
   - Bearer token en este alcance: descartado por desalineacion con requerimiento
     normativo actual.
 
-## Decision 3: Verificacion de credenciales contra tabla `empleado`
+## Decision 3: Verificacion de credenciales contra ta 0bla `empleado`
 - Decision: Resolver identidad por `correo_electronico` persistido en `empleado`
   y validar `contrasena` transitoria por comparacion de hash derivado contra
   `contrasena_hash` almacenado.

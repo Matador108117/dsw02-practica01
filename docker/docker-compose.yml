@@ -8,12 +8,14 @@ services:
       DB_URL: jdbc:postgresql://postgres:5432/empleados_db
       DB_USER: empleados
       DB_PASSWORD: empleados
-      APP_USER: admin
-      APP_PASSWORD: admin123
+      APP_BOOTSTRAP_ADMIN_EMAIL: admin@empresa.com
+      APP_BOOTSTRAP_ADMIN_PASSWORD: Admin123!
       APP_TEST_USER_NAME: prueba2
       APP_TEST_USER_EMAIL: emailprueba@gmail.com
       APP_TEST_USER_PASSWORD: contra123
       APP_TEST_USER_ROLE: USER
+      API_RELEASE_V2_UTC: 2026-03-14T00:00:00Z
+      API_SUNSET_V1_UTC: 2026-06-12T00:00:00Z
     ports:
       - "8080:8080"
     depends_on:

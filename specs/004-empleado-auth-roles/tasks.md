@@ -17,10 +17,10 @@
 
 **Purpose**: Preparar base tecnica y operativa para auth por correo, roles, versionado v1/v2 y politicas UTC.
 
-- [ ] T001 Alinear configuracion de DB, seguridad y variables de bootstrap in src/main/resources/application.yml
-- [ ] T002 [P] Verificar dependencias de seguridad, validacion, OpenAPI y pruebas in pom.xml
-- [ ] T003 [P] Alinear metadata OpenAPI base para versionado y seguridad in src/main/java/com/dsw02/empleados/config/OpenApiConfig.java
-- [ ] T004 [P] Ajustar runtime Docker PostgreSQL local/CI in docker/docker-compose.yml
+- [x] T001 Alinear configuracion de DB, seguridad y variables de bootstrap in src/main/resources/application.yml
+- [x] T002 [P] Verificar dependencias de seguridad, validacion, OpenAPI y pruebas in pom.xml
+- [x] T003 [P] Alinear metadata OpenAPI base para versionado y seguridad in src/main/java/com/dsw02/empleados/config/OpenApiConfig.java
+- [x] T004 [P] Ajustar runtime Docker PostgreSQL local/CI in docker/docker-compose.yml
 
 ---
 
