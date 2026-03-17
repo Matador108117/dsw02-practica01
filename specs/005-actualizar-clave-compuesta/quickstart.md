@@ -37,7 +37,7 @@ mvn spring-boot:run
 
 ## 5) Validar contrato OpenAPI/Swagger
 
-- Contrato planificado: `specs/001-actualizar-clave-compuesta/contracts/empleados.openapi.yaml`
+- Contrato planificado: `specs/005-actualizar-clave-compuesta/contracts/empleados.openapi.yaml`
 - Swagger UI esperado: `http://localhost:8080/swagger-ui/index.html`
 
 ## 6) Pruebas de integración mínimas obligatorias

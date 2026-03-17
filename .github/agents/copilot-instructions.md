@@ -3,9 +3,9 @@
 Auto-generated from all feature plans. Last updated: 2026-02-26
 
 ## Active Technologies
-- PostgreSQL (Docker-managed in local and CI) (001-actualizar-clave-compuesta)
+- PostgreSQL (Docker-managed in local and CI) (005-actualizar-clave-compuesta)
 
-- Java 17 + Spring Boot 3, Spring Security, Spring Data JPA, springdoc-openapi (001-crud-empleados)
+- Java 17 + Spring Boot 3, Spring Security, Spring Data JPA, springdoc-openapi (003-crud-empleados)
 
 ## Project Structure
 
@@ -24,9 +24,10 @@ tests/
 Java 17: Follow standard conventions
 
 ## Recent Changes
-- 001-actualizar-clave-compuesta: Added Java 17 + Spring Boot 3, Spring Security, Spring Data JPA, springdoc-openapi
+- 001-swagger-global-auth: Added Java 17 + Spring Boot 3, Spring Security, Spring Data JPA,
+- 004-empleado-auth-roles: Added Java 17 + Spring Boot 3, Spring Security, Spring Data JPA,
+- 004-empleado-auth-roles: Added Java 17 + Spring Boot 3, Spring Security, Spring Data JPA,
 
-- 001-crud-empleados: Added Java 17 + Spring Boot 3, Spring Security, Spring Data JPA, springdoc-openapi
 
 <!-- MANUAL ADDITIONS START -->
 <!-- MANUAL ADDITIONS END -->

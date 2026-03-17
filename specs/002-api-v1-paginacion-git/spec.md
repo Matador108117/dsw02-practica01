@@ -1,6 +1,6 @@
 # Feature Specification: Gobierno inicial de API y Git
 
-**Feature Branch**: `001-api-v1-paginacion-git`  
+**Feature Branch**: `002-api-v1-paginacion-git`  
 **Created**: 2026-03-04  
 **Status**: Draft  
 **Input**: User description: "define la versión inicial de la API, manejar paginación en endpoints de colecciones, definir remoto del repositorio y convención correcta de ramas"

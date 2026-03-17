@@ -24,7 +24,10 @@
 **Target Platform**: Linux server
 **Project Type**: backend web-service  
 **Performance Goals**: Define per feature (must include measurable latency/throughput target)  
-**Constraints**: HTTP Basic Auth, OpenAPI/Swagger required, Docker parity for DB,
+**Constraints**: Mandatory HTTP Basic auth (`type=http`, `scheme=basic`) on API
+methods using `correo_electronico` as username and transient `contrasena`
+validated against persisted `contrasena_hash`, role-based access (`USER`
+read-only, `ADMIN` CRUD), OpenAPI/Swagger required, Docker parity for DB,
 API major versioning (`/api/v{major}`), paginated list endpoints, feature-branch + PR workflow  
 **Scale/Scope**: Define per feature with expected API and data volume
 
@@ -33,12 +36,21 @@ API major versioning (`/api/v{major}`), paginated list endpoints, feature-branch
 *GATE: Must pass before Phase 0 research. Re-check after Phase 1 design.*
 
 - Stack gate: Plan uses Spring Boot 3 + Java 17 only.
-- Security gate: Protected endpoints include HTTP Basic Auth design and test strategy.
+- Security gate: Protected endpoints include mandatory HTTP Basic auth (`type=http`,
+  `scheme=basic`) with `correo_electronico` username mapping, transient password
+  verification against persisted hash, plus role policy (`USER` read-only,
+  `ADMIN` CRUD) design and test strategy.
 - Data gate: PostgreSQL schema/data changes and Docker runtime impact are documented.
+- Employee data gate: Any feature touching `empleado` persistence documents and
+  enforces required `correo_electronico` and `contrasena_hash` attributes, while
+  keeping `contrasena` as input-only and not persisted in plaintext.
 - Contract gate: OpenAPI changes and Swagger evidence are explicitly listed.
-- Quality gate: Integration tests for auth, DB, and API contract are planned.
+- Quality gate: Integration tests for auth, role authorization, DB, and API contract
+  are planned.
 - Versioning gate: API path version impact is documented (`/api/v{major}`) and
   breaking changes include migration notes.
+- Sunset gate: Deprecated version cutoff behavior is documented and enforces
+  `410 Gone` using UTC as business clock.
 - Pagination gate: List endpoints define defaults, max limits, and validation tests.
 - Workflow gate: Branch strategy, atomic commits, and PR traceability to spec/tasks
   are explicitly documented.

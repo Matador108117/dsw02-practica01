@@ -1,6 +1,6 @@
 # Tasks: CRUD de Empleados con Clave Compuesta
 
-**Input**: Design documents from `/specs/001-actualizar-clave-compuesta/`
+**Input**: Design documents from `/specs/005-actualizar-clave-compuesta/`
 **Prerequisites**: plan.md (required), spec.md (required for user stories), research.md, data-model.md, contracts/
 
 **Tests**: Se incluyen tareas de pruebas porque la especificación exige integración para autenticación, persistencia y contrato (BC-006), además de validar concurrencia de claves (SC-002).
@@ -122,11 +122,11 @@
 
 **Purpose**: Cierre transversal de contrato, seguridad, observabilidad y documentación.
 
-- [X] T040 [P] Align implementation with API contract in specs/001-actualizar-clave-compuesta/contracts/empleados.openapi.yaml
+- [X] T040 [P] Align implementation with API contract in specs/005-actualizar-clave-compuesta/contracts/empleados.openapi.yaml
 - [X] T041 Add integration test for unauthorized access across CRUD endpoints in src/test/java/integration/SecurityCrudIntegrationIT.java
 - [X] T042 [P] Add startup/runtime failure logging validation scenario in src/test/java/integration/OperabilityLoggingIntegrationIT.java
-- [X] T043 [P] Update quickstart execution notes with implemented commands and checks in specs/001-actualizar-clave-compuesta/quickstart.md
-- [X] T044 Run full test suite and record evidence in specs/001-actualizar-clave-compuesta/checklists/requirements.md
+- [X] T043 [P] Update quickstart execution notes with implemented commands and checks in specs/005-actualizar-clave-compuesta/quickstart.md
+- [X] T044 Run full test suite and record evidence in specs/005-actualizar-clave-compuesta/checklists/requirements.md
 
 ---
 

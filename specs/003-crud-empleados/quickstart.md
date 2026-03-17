@@ -35,7 +35,7 @@ docker ps
 
 ## 5) Verificar contrato API (OpenAPI/Swagger)
 
-- Contrato planificado: `specs/001-crud-empleados/contracts/empleados.openapi.yaml`
+- Contrato planificado: `specs/003-crud-empleados/contracts/empleados.openapi.yaml`
 - Swagger UI esperado en ejecución: `http://localhost:8080/swagger-ui/index.html`
 
 ## 6) Pruebas mínimas obligatorias

@@ -93,17 +93,29 @@
 ### Backend Constraints *(mandatory)*
 
 - **BC-001**: Solution MUST run on Spring Boot 3 with Java 17.
-- **BC-002**: Protected endpoints MUST define HTTP Basic Authentication behavior.
-- **BC-003**: Data persistence MUST target PostgreSQL.
-- **BC-004**: Local and CI database execution MUST be Docker-based.
-- **BC-005**: API changes MUST include OpenAPI/Swagger documentation updates.
-- **BC-006**: Spec MUST state required integration tests for auth, DB, and API contract.
-- **BC-007**: Public API endpoints MUST be versioned with `/api/v{major}` and
+- **BC-002**: Protected endpoints MUST define mandatory HTTP Basic
+  (`type=http`, `scheme=basic`) authentication behavior.
+- **BC-002a**: Basic Auth username MUST map to persisted `correo_electronico`.
+- **BC-002b**: Basic Auth password MUST be transient input and MUST be validated
+  by comparing derived hash against persisted `contrasena_hash`.
+- **BC-003**: Authorization MUST enforce `USER` read-only access and `ADMIN` full CRUD access.
+- **BC-004**: Data persistence MUST target PostgreSQL.
+- **BC-005**: Local and CI database execution MUST be Docker-based.
+- **BC-006**: API changes MUST include OpenAPI/Swagger documentation updates.
+- **BC-007**: Spec MUST state required integration tests for auth, role authorization,
+  DB, and API contract.
+- **BC-008**: Public API endpoints MUST be versioned with `/api/v{major}` and
   breaking changes MUST declare migration impact.
-- **BC-008**: Collection endpoints MUST define pagination parameters plus default and
+- **BC-009**: Collection endpoints MUST define pagination parameters plus default and
   maximum page limits.
-- **BC-009**: Implementation workflow MUST define feature branch, PR traceability,
+- **BC-010**: Implementation workflow MUST define feature branch, PR traceability,
   and expected commit granularity.
+- **BC-011**: The `empleado` persistence model/table MUST enforce required
+  `correo_electronico` and `contrasena_hash` attributes.
+- **BC-012**: `contrasena` MUST be treated as input-only and MUST NOT be persisted
+  in plaintext.
+- **BC-013**: Deprecated API versions past sunset MUST respond `410 Gone`, with UTC
+  as the business clock for cutoff evaluation.
 
 *Example of marking unclear requirements:*
 

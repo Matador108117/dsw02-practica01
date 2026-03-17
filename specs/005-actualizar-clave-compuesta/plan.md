@@ -1,7 +1,7 @@
 # Implementation Plan: CRUD de Empleados con Clave Compuesta
 
-**Branch**: `001-actualizar-clave-compuesta` | **Date**: 2026-02-26 | **Spec**: `/specs/001-actualizar-clave-compuesta/spec.md`
-**Input**: Feature specification from `/specs/001-actualizar-clave-compuesta/spec.md`
+**Branch**: `005-actualizar-clave-compuesta` | **Date**: 2026-02-26 | **Spec**: `/specs/005-actualizar-clave-compuesta/spec.md`
+**Input**: Feature specification from `/specs/005-actualizar-clave-compuesta/spec.md`
 
 **Note**: This template is filled in by the `/speckit.plan` command. See `.specify/templates/plan-template.md` for the execution workflow.
 
@@ -47,7 +47,7 @@ sin colisiones y pruebas de integración para autenticación, base de datos y co
 ### Documentation (this feature)
 
 ```text
-specs/001-actualizar-clave-compuesta/
+specs/005-actualizar-clave-compuesta/
 ├── plan.md              # This file (/speckit.plan command output)
 ├── research.md          # Phase 0 output (/speckit.plan command)
 ├── data-model.md        # Phase 1 output (/speckit.plan command)
@@ -82,7 +82,7 @@ docker/
 **Structure Decision**: Se adopta una estructura monolítica Spring por capas (`controller`,
 `service`, `repository`, `model`) para aislar reglas de generación de clave compuesta y facilitar
 pruebas de integración. En este repositorio, las rutas de código fuente se crearán en implementación;
-esta fase mantiene artefactos de diseño en `specs/001-actualizar-clave-compuesta/`.
+esta fase mantiene artefactos de diseño en `specs/005-actualizar-clave-compuesta/`.
 
 ## Complexity Tracking
 

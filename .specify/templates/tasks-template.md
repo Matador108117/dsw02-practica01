@@ -64,9 +64,17 @@ Examples of foundational tasks (adjust based on your project):
 
 - [ ] T005 Setup PostgreSQL schema and migrations framework
 - [ ] T006 [P] Configure Docker Compose for PostgreSQL local/CI runtime
-- [ ] T007 [P] Implement HTTP Basic Authentication with Spring Security
+- [ ] T007 [P] Implement mandatory HTTP Basic (`type=http`, `scheme=basic`) on
+  API methods with Spring Security, using `correo_electronico` as username and
+  role-based authorization (`USER` read-only, `ADMIN` CRUD)
+- [ ] T007a [P] Enforce required `correo_electronico` and `contrasena_hash`
+  attributes in `empleado` schema/entity validation and migration scripts;
+  treat `contrasena` as input-only (no plaintext persistence) and validate
+  authentication by hash comparison against `contrasena_hash`
 - [ ] T008 [P] Setup API routing and global exception handling
 - [ ] T009 [P] Establish API versioning baseline (`/api/v1`) and route conventions
+- [ ] T009a [P] Implement UTC-based sunset enforcement for deprecated versions
+  with `410 Gone` response behavior
 - [ ] T010 [P] Define reusable pagination request/response model and defaults
 - [ ] T011 Create base entities/repositories shared by user stories
 - [ ] T012 Configure structured logging and environment configuration
@@ -94,7 +102,7 @@ Examples of foundational tasks (adjust based on your project):
 - [ ] T016 [P] [US1] Create [Entity2] in src/main/java/.../model/[Entity2].java
 - [ ] T017 [US1] Implement [Service] in src/main/java/.../service/[Service].java (depends on T015, T016)
 - [ ] T018 [US1] Implement [endpoint/feature] in src/main/java/.../controller/[Controller].java
-- [ ] T019 [US1] Add validation, error handling, auth rules, and pagination behavior
+- [ ] T019 [US1] Add validation, error handling, role auth rules, and pagination behavior
 - [ ] T020 [US1] Update OpenAPI annotations with versioned path and verify Swagger rendering
 
 **Checkpoint**: At this point, User Story 1 should be fully functional and testable independently
@@ -157,7 +165,7 @@ Examples of foundational tasks (adjust based on your project):
 - [ ] TXXX Code cleanup and refactoring
 - [ ] TXXX Performance optimization across all stories
 - [ ] TXXX [P] Additional unit tests (if requested) in src/test/java/unit/
-- [ ] TXXX Security hardening and Basic Auth regression checks
+- [ ] TXXX Security hardening and auth/role regression checks
 - [ ] TXXX Confirm commit history is atomic and PR links all tasks/spec requirements
 - [ ] TXXX Run quickstart.md validation
 

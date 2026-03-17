@@ -10,6 +10,10 @@ services:
       DB_PASSWORD: empleados
       APP_USER: admin
       APP_PASSWORD: admin123
+      APP_TEST_USER_NAME: prueba2
+      APP_TEST_USER_EMAIL: emailprueba@gmail.com
+      APP_TEST_USER_PASSWORD: contra123
+      APP_TEST_USER_ROLE: USER
     ports:
       - "8080:8080"
     depends_on:

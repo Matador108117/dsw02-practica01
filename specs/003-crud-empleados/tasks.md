@@ -1,6 +1,6 @@
 # Tasks: CRUD de Empleados
 
-**Input**: Design documents from `/specs/001-crud-empleados/`
+**Input**: Design documents from `/specs/003-crud-empleados/`
 **Prerequisites**: plan.md (required), spec.md (required for user stories), research.md, data-model.md, contracts/
 
 **Tests**: Se incluyen tareas de pruebas porque la especificación exige cobertura de integración para autenticación, persistencia y contrato de API (BC-006).
@@ -116,10 +116,10 @@
 
 **Purpose**: Cierre técnico, evidencia de calidad y alineación final de contrato.
 
-- [ ] T034 [P] Align implemented API annotations with contract in specs/001-crud-empleados/contracts/empleados.openapi.yaml
+- [ ] T034 [P] Align implemented API annotations with contract in specs/003-crud-empleados/contracts/empleados.openapi.yaml
 - [ ] T035 Add integration test for unauthorized access across CRUD endpoints in src/test/java/integration/SecurityCrudIntegrationIT.java
-- [ ] T036 [P] Add quickstart verification notes and execution commands in specs/001-crud-empleados/quickstart.md
-- [ ] T037 Run full test suite and document outcomes in specs/001-crud-empleados/checklists/requirements.md
+- [ ] T036 [P] Add quickstart verification notes and execution commands in specs/003-crud-empleados/quickstart.md
+- [ ] T037 Run full test suite and document outcomes in specs/003-crud-empleados/checklists/requirements.md
 
 ---
 

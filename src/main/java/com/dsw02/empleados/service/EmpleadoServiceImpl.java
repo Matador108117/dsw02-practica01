@@ -1,16 +1,18 @@
 package com.dsw02.empleados.service;
 
+import java.util.List;
+
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
+
 import com.dsw02.empleados.controller.dto.EmpleadoDtos.EmpleadoCreateRequest;
 import com.dsw02.empleados.controller.dto.EmpleadoDtos.EmpleadoResponse;
 import com.dsw02.empleados.controller.dto.EmpleadoDtos.EmpleadoUpdateRequest;
 import com.dsw02.empleados.model.ClaveEmpleadoId;
 import com.dsw02.empleados.model.Empleado;
 import com.dsw02.empleados.repository.EmpleadoRepository;
-import java.util.List;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-import org.springframework.stereotype.Service;
-import org.springframework.transaction.annotation.Transactional;
 
 @Service
 public class EmpleadoServiceImpl implements EmpleadoService {
@@ -42,6 +44,8 @@ public class EmpleadoServiceImpl implements EmpleadoService {
         empleado.setNombre(request.nombre().trim());
         empleado.setDireccion(request.direccion().trim());
         empleado.setTelefono(request.telefono().trim());
+        empleado.setCorreoElectronico(request.correoElectronico().trim());
+        empleado.setContrasena(request.contrasena());
 
         Empleado saved = repository.save(empleado);
         EmpleadoResponse response = toResponse(saved);
@@ -73,6 +77,8 @@ public class EmpleadoServiceImpl implements EmpleadoService {
         empleado.setNombre(request.nombre().trim());
         empleado.setDireccion(request.direccion().trim());
         empleado.setTelefono(request.telefono().trim());
+        empleado.setCorreoElectronico(request.correoElectronico().trim());
+        empleado.setContrasena(request.contrasena());
 
         Empleado saved = repository.save(empleado);
         EmpleadoResponse response = toResponse(saved);
@@ -98,7 +104,8 @@ public class EmpleadoServiceImpl implements EmpleadoService {
             consecutivo,
             empleado.getNombre(),
             empleado.getDireccion(),
-            empleado.getTelefono()
+            empleado.getTelefono(),
+            empleado.getCorreoElectronico()
         );
     }
 }

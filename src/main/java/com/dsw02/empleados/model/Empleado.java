@@ -1,12 +1,13 @@
 package com.dsw02.empleados.model;
 
+import java.time.LocalDateTime;
+
 import jakarta.persistence.Column;
 import jakarta.persistence.EmbeddedId;
 import jakarta.persistence.Entity;
 import jakarta.persistence.PrePersist;
 import jakarta.persistence.PreUpdate;
 import jakarta.persistence.Table;
-import java.time.LocalDateTime;
 
 @Entity
 @Table(name = "empleado")
@@ -23,6 +24,12 @@ public class Empleado {
 
     @Column(name = "telefono", nullable = false, length = 100)
     private String telefono;
+
+    @Column(name = "correo_electronico", nullable = false, length = 150)
+    private String correoElectronico;
+
+    @Column(name = "contrasena", nullable = false, length = 255)
+    private String contrasena;
 
     @Column(name = "created_at")
     private LocalDateTime createdAt;
@@ -60,6 +67,22 @@ public class Empleado {
 
     public void setTelefono(String telefono) {
         this.telefono = telefono;
+    }
+
+    public String getCorreoElectronico() {
+        return correoElectronico;
+    }
+
+    public void setCorreoElectronico(String correoElectronico) {
+        this.correoElectronico = correoElectronico;
+    }
+
+    public String getContrasena() {
+        return contrasena;
+    }
+
+    public void setContrasena(String contrasena) {
+        this.contrasena = contrasena;
     }
 
     public LocalDateTime getCreatedAt() {

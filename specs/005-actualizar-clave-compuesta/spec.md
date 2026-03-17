@@ -1,9 +1,9 @@
 # Feature Specification: CRUD de Empleados con Clave Compuesta
 
-**Feature Branch**: `001-actualizar-clave-compuesta`  
+**Feature Branch**: `005-actualizar-clave-compuesta`  
 **Created**: 2026-02-26  
 **Status**: Draft  
-**Input**: User description: "modifica la especificacion 001-crud-empleados donde el campo clave sea un prefijo EMP- seguido de un auto numerico como PK compuesta"
+**Input**: User description: "modifica la especificacion 003-crud-empleados donde el campo clave sea un prefijo EMP- seguido de un auto numerico como PK compuesta"
 
 ## User Scenarios & Testing *(mandatory)*
 

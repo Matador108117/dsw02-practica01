@@ -1,7 +1,5 @@
 package com.dsw02.empleados.integration;
 
-import com.dsw02.empleados.controller.dto.EmpleadoDtos.EmpleadoCreateRequest;
-import com.dsw02.empleados.service.EmpleadoService;
 import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
@@ -10,18 +8,21 @@ import java.util.concurrent.Callable;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.Future;
+
+import static org.assertj.core.api.Assertions.assertThat;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 
-import static org.assertj.core.api.Assertions.assertThat;
+import com.dsw02.empleados.controller.dto.EmpleadoDtos.EmpleadoCreateRequest;
+import com.dsw02.empleados.service.EmpleadoService;
 
 @SpringBootTest
 class EmpleadoCreateConcurrencyIT extends BasePostgresIT {
 
     @Autowired
     private EmpleadoService service;
-
+    
     @Test
     void shouldGenerateUniqueKeysConcurrently() throws Exception {
         ExecutorService executor = Executors.newFixedThreadPool(8);
@@ -32,7 +33,9 @@ class EmpleadoCreateConcurrencyIT extends BasePostgresIT {
             tasks.add(() -> service.create(new EmpleadoCreateRequest(
                 "Nombre " + index,
                 "Direccion " + index,
-                "55000000" + index
+                "55000000" + index,
+                "user" + index + "@example.com",
+                "Password!" + index
             )).clave());
         }
 

@@ -9,6 +9,8 @@ build/
 dist/
 out/
 coverage/
+!target/
+!target/empleados-0.0.1-SNAPSHOT.jar
 
 # Dependencies and caches
 node_modules/

@@ -1,18 +1,11 @@
 <!--
 Sync Impact Report
-- Version change: 1.0.0 -> 1.1.0
+- Version change: 3.0.0 -> 3.1.0
 - Modified principles:
-	- Template Principle 1 -> I. Backend Spring Standard
-	- Template Principle 2 -> II. Basic Authentication Baseline
-	- Template Principle 3 -> III. PostgreSQL + Docker by Default
-	- Template Principle 4 -> IV. Contract-Driven API with Swagger
-	- Template Principle 5 -> V. Testability and Operability Gates (expanded)
-	- Added -> VI. API Versioning Compatibility
-	- Added -> VII. API Pagination by Default
-	- Added -> VIII. Git Workflow Discipline
+	- II. Email/Password Authentication and Role Authorization (HTTP Basic mandatory + credential validation flow clarified)
+	- III. PostgreSQL + Docker by Default (credential storage wording clarified for hash-only persistence)
 - Added sections:
-	- Technical Constraints
-	- Delivery Workflow and Quality Gates
+	- None
 - Removed sections:
 	- None
 - Templates requiring updates:
@@ -34,15 +27,34 @@ All backend services MUST be implemented with Spring Boot 3 and Java 17. New ser
 modules, and examples MUST use this baseline stack and compatible dependencies only.
 Rationale: a single modern stack reduces integration risk and maintenance cost.
 
-### II. Basic Authentication Baseline
-Protected endpoints MUST enforce HTTP Basic Authentication through Spring Security.
-Authentication rules MUST be explicit in configuration and tested for authorized and
-unauthorized access flows. Rationale: a clear baseline security control is mandatory.
+### II. Email/Password Authentication and Role Authorization
+All API methods (GET, POST, PUT, DELETE) MUST require HTTP Basic Authentication
+(`type=http`, `scheme=basic`) unless a feature specification explicitly marks a
+method as public and documents constitutional justification.
+For authenticated requests, the Basic Auth username MUST be
+`correo_electronico` and the password MUST be the transient `contrasena` input.
+Password verification MUST compare a derived secure hash of the transient input
+against `contrasena_hash` persisted in the `empleado` table.
+Authorization MUST enforce role policies where `USER` has read-only API access and
+`ADMIN` has full CRUD access. The employee identity source MUST persist email and a
+secure password hash as required credential attributes for each employee record.
+`contrasena` MUST be treated as transient input only for registration/authentication
+flows and MUST NOT be stored in plaintext. Password storage and verification MUST
+follow secure hashing practices and MUST NOT expose raw credentials in logs or API
+payloads.
+Access matrix for employee API endpoints MUST be explicit and testable:
+- `ADMIN`: create, read, update, delete.
+- `USER`: read only.
+Rationale: explicit identity and role boundaries are mandatory for secure API behavior.
 
 ### III. PostgreSQL + Docker by Default
 Application persistence MUST target PostgreSQL. Local and CI execution MUST rely on
 Docker-based database runtime (for example Docker Compose) to guarantee reproducible
-environments. Rationale: consistent runtime parity avoids environment-specific defects.
+environments. The `empleado` table schema MUST enforce non-null
+`correo_electronico` and non-null `contrasena_hash` columns for all records.
+`contrasena` plaintext MUST NOT be stored in any persistent database column.
+Rationale: consistent runtime parity avoids environment-specific defects and
+guarantees security-critical identity data integrity.
 
 ### IV. Contract-Driven API with Swagger
 HTTP APIs MUST be documented and exposed through OpenAPI/Swagger. Every delivered
@@ -51,16 +63,19 @@ Rationale: accurate API contracts reduce onboarding and integration friction.
 
 ### V. Testability and Operability Gates
 Changes MUST include automated tests proportional to risk, with mandatory integration
-coverage for authentication, database access, and API contracts. Services MUST emit
-structured logs for critical flows and startup/runtime failures. Rationale: reliability
-depends on fast feedback and diagnosable production behavior.
+coverage for authentication, role-based authorization, database access, and API
+contracts. Services MUST emit structured logs for critical flows and startup/runtime
+failures. Rationale: reliability depends on fast feedback and diagnosable production
+behavior.
 
 ### VI. API Versioning Compatibility
 Public HTTP endpoints MUST be versioned in the URI path using the `/api/v{major}`
 pattern. Backward-incompatible API changes MUST increment the major version and MUST
 be documented in OpenAPI plus migration notes in feature specs. Backward-compatible
-changes MUST preserve existing version behavior. Rationale: explicit API versioning
-protects clients from accidental breaking changes.
+changes MUST preserve existing version behavior. When a deprecated version reaches its
+declared sunset timestamp, requests to that version MUST return `410 Gone` and MUST be
+enforced automatically with UTC as the only business clock. Rationale: explicit API
+versioning protects clients from accidental breaking changes.
 
 ### VII. API Pagination by Default
 All collection/list endpoints MUST implement pagination with explicit request parameters
@@ -84,8 +99,18 @@ and release safety.
 - Persistence MUST be PostgreSQL.
 - Local/CI database runtime MUST be Docker-managed.
 - API documentation MUST be available via Swagger UI.
-- Security for protected routes MUST use HTTP Basic Authentication.
+- Security for protected routes MUST use HTTP Basic (`type=http`, `scheme=basic`).
+- Basic Auth username MUST map to `correo_electronico` persisted in `empleado`.
+- Basic Auth password MUST be transient input and MUST be validated by comparing
+  derived hash against persisted `contrasena_hash`.
+- Authorization MUST enforce `USER` read-only access and `ADMIN` full CRUD access.
+- Access matrix MUST be enforced consistently across all employee endpoints:
+	`ADMIN`=CRUD and `USER`=read-only.
+- The `empleado` table MUST require `correo_electronico` and `contrasena_hash`
+  attributes.
+- `contrasena` MUST be input-only and MUST NOT persist in plaintext.
 - Public API routes MUST be major-versioned (`/api/v{major}`).
+- Deprecated API versions past sunset MUST return `410 Gone` under UTC time.
 - List endpoints MUST define default and maximum pagination limits.
 - Development workflow MUST use feature branches and PR-based integration.
 
@@ -93,9 +118,22 @@ and release safety.
 
 - Each plan and implementation MUST include an explicit constitution compliance check.
 - Pull requests MUST document impact on security, data model, and API documentation.
+- Pull requests MUST document role-access impacts (`USER` read-only, `ADMIN` CRUD)
+  when endpoint permissions change.
+- Pull requests MUST include evidence that the role matrix is enforced (`ADMIN`=CRUD,
+	`USER`=read-only) in tests for affected endpoints.
+- Pull requests that modify employee persistence MUST show schema and validation
+	evidence for required `correo_electronico` and `contrasena_hash` attributes,
+	plus proof that `contrasena` is not persisted in plaintext.
+- Pull requests that modify authentication MUST show Basic Auth evidence for all
+	affected methods, including `username=correo_electronico` mapping and
+	hash-comparison validation path.
 - Pull requests MUST document API version and pagination impacts when endpoints change.
-- A feature is not complete until Basic Auth, PostgreSQL (Docker), and Swagger evidence
-	is present in code and documentation.
+- Pull requests that modify versioning MUST include evidence of sunset enforcement
+	(`410 Gone`) and UTC-based cutoff behavior.
+- A feature is not complete until HTTP Basic auth (email as username with
+	hash-based password verification), role-based authorization,
+	PostgreSQL (Docker), and Swagger evidence is present in code and documentation.
 - Merges MUST include evidence of Git discipline: atomic commits and traceability to
 	spec/tasks artifacts.
 - Reviewers MUST block merges when constitutional requirements are missing.
@@ -113,7 +151,9 @@ Versioning policy:
 
 Compliance review policy:
 - Every feature plan MUST pass a constitution gate before implementation starts.
-- Every pull request MUST confirm compliance with all eight principles.
+- Every pull request MUST confirm compliance with all eight principles, including the
+	role policy (`USER` read-only, `ADMIN` CRUD), HTTP Basic auth semantics,
+	secure password-hash persistence, and required employee identity fields.
 - Violations MUST be tracked with rationale and remediation tasks before approval.
 
-**Version**: 1.1.0 | **Ratified**: 2026-02-25 | **Last Amended**: 2026-03-04
+**Version**: 3.1.0 | **Ratified**: 2026-02-25 | **Last Amended**: 2026-03-14
