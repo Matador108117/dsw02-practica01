@@ -74,6 +74,7 @@ The Swagger/OpenAPI specification documents HTTP Basic authentication as the man
 - What happens when password contains Base64-reserved characters (e.g., `+`, `/`, `=`)? → System MUST handle correctly after decoding.
 - What happens when multiple requests with different credentials are sent in rapid succession? → Each request MUST be authenticated independently without cache/session conflicts.
 - What happens on extremely high authentication traffic? → System MUST maintain consistent hash-comparison time (constant-time comparison to prevent timing attacks).
+- What happens after 5 failed login attempts in one minute for a given email? → System MUST temporarily lock that email for 5–10 minutes with exponential backoff.
 
 ## Requirements *(mandatory)*
 
@@ -96,6 +97,9 @@ The Swagger/OpenAPI specification documents HTTP Basic authentication as the man
 - **FR-010**: System MUST document security requirement (HTTPS mandatory) in feature spec and migration notes.
 - **FR-011**: System MUST apply HTTP Basic authentication to ALL protected endpoints unless feature spec explicitly marks endpoint as public with constitutional justification.
 - **FR-012**: System MUST log authentication attempts (success/failure) with email and timestamp for security auditing.
+- **FR-013**: System MUST implement brute-force protection by rate-limiting failed authentication attempts: maximum 5 failed attempts per email per minute, followed by exponential backoff (5–10 minute temporary lock) on that email address.
+- **FR-014**: System MUST explicitly exclude password reset, account unlock, and credential administration endpoints from scope. These capabilities are deferred to a future "Admin Dashboard" or "Credential Management" feature.
+- **FR-015**: System MUST operate as **stateless** with respect to authentication: each HTTP request containing a valid `Authorization: Basic` header is independently authenticated without server-side session state. Clients MAY cache credentials locally (e.g., in Swagger UI browser storage); logout is a client-side operation (credential removal from client storage). Server MUST NOT implement session tracking, token issuance, or concurrent session limits.
 
 ### Backend Constraints
 
@@ -117,8 +121,44 @@ The Swagger/OpenAPI specification documents HTTP Basic authentication as the man
 - **BC-014**: Password comparison MUST use constant-time comparison to prevent timing attacks (e.g., `javax.crypto.Cipher` or Spring Security's `PasswordEncoder.matches()`).
 - **BC-015**: Credentials MUST NOT appear in logs, error messages, or API responses; only email (for auditing) and generic "invalid credentials" may be logged.
 - **BC-016**: Basic Auth transmission MUST be over HTTPS in production; HTTP MUST only be used for local development/testing with clear warnings.
+- **BC-017**: Rate limiting MUST be implemented per email address (not per IP): track failed attempts, allow maximum 5 per minute, and apply exponential backoff cooldown (5–10 minutes) on lockout; successful authentication MUST reset the failed attempt counter for that email.
+- **BC-018**: System failures (database unavailable, auth service down) MUST NOT trigger fallback/bypass mechanisms; instead, authentication requests MUST fail fast with HTTP 503 (Service Unavailable) within 1 second without attempting any access or caching credentials.
+- **BC-019**: HTTP Basic Authentication is the permanent and exclusive authentication scheme for this API. OAuth2, OIDC, JWT, and token-based authentication are explicitly NOT supported and are NOT planned for future introduction to this endpoint. Federation and multi-app scenarios requiring OAuth2 MUST use a separate API gateway or middleware layer; they MUST NOT drive changes to this feature's authentication model.
+- **BC-020**: Authentication is **stateless**: the system MUST NOT implement session management, session tokens, cookies, or concurrent session limits. Each request is independently authenticated by decoding and validating the `Authorization: Basic` header. Logout is a client-side operation (credential removal from client storage); the server has no logout endpoint or session invalidation logic.
 
-### Key Entities
+### Non-Functional Requirements
+
+- **NFR-001**: System uptime MUST target 99.9% monthly availability (max ~43 minutes downtime/month).
+- **NFR-002**: Recovery Time Objective (RTO) on complete outage MUST be under 15 minutes after failure recovery.
+- **NFR-003**: Mean Time To Detection (MTTD) of authentication service degradation MUST be under 30 seconds via automated monitoring.
+
+## Design Rationale & Trade-offs
+
+### Why HTTP Basic Authentication?
+
+HTTP Basic Authentication is chosen as the **permanent and exclusive** authentication scheme for this API because:
+
+1. **Simplicity**: Zero session state, zero token management, zero refresh token lifecycle. Clients encode `email:password` in header; server verifies instantly. Minimal operational complexity.
+2. **Monolithic API Scope**: This API is internal to a single monolithic Spring Boot application serving one frontend (Swagger UI + internal dashboards). Multi-app federation, external integrations, and OAuth2 flows are **not required** for current and foreseeable business use cases.
+3. **Security Sufficiency**: Combined with HTTPS, constant-time hash comparison, and per-email rate limiting, Basic Auth provides adequate security for employee/internal user authentication without the overhead of token issuance, rotation, and revocation.
+4. **Regulatory Alignment**: HTTP Basic over HTTPS meets standard internal-API security expectations without triggering OAuth2 risk/complexity for internal use.
+
+### Explicitly Rejected Alternatives
+
+**OAuth2/OIDC**: Rejected because they introduce session/token lifecycle complexity (issuance, refresh, revocation, expiry), require additional infrastructure (token storage, refresh token rotation), and solve multi-app federation problems that are **out of scope** for this monolithic API. If federated multi-app authentication becomes necessary in the future, a **separate API Gateway or middleware layer** MUST be introduced to handle OAuth2 translation; this feature's Basic Auth implementation MUST NOT be modified.
+
+**JWT**: Rejected for similar reasons (token lifecycle, signature verification overhead, revocation complexity) without federation benefits of OAuth2. Not suitable for internal monolithic API with direct password access.
+
+### Migration Path for Future Scenarios
+
+If external API consumers or multi-app federation requirements emerge in the future:
+1. **Do NOT modify this feature** to add OAuth2/token support.
+2. **Instead, introduce an API Gateway** (e.g., Kong, Nginx reverse proxy, AWS API Gateway) that handles OAuth2 client authentication and translates it to internal HTTP Basic calls, maintaining this feature's single-purpose design.
+3. Document the gateway's OAuth2 → Basic Auth translation as a separate architectural layer.
+
+**Rationale**: Preserving this feature's single-purpose, simple design ensures long-term maintainability and prevents scope creep from federation requirements.
+
+## Key Entities
 
 - **Empleado**: Represents an employee/user with authentication credentials.
   - `correo_electronico` (String, required, unique, case-insensitive): Email address used as Basic Auth username.
@@ -145,6 +185,19 @@ The Swagger/OpenAPI specification documents HTTP Basic authentication as the man
 - **SC-007**: No plaintext passwords appear in database, logs, or API responses during normal operation.
 - **SC-008**: Constant-time hash comparison is implemented; timing differences between valid and invalid passwords are less than 10ms (platform-dependent baseline).
 - **SC-009**: Audit logs record all authentication attempts (success/failure) with email and timestamp for 90 days of retention.
+- **SC-010**: Rate limiting is enforced: after 5 failed attempts per email per minute, further attempts are blocked with HTTP 429 (Too Many Requests) for 5–10 minutes; successful login resets the counter.
+- **SC-011**: System availability meets 99.9% monthly uptime target; authentication failures due to service unavailability return HTTP 503 within 1 second without credential caching fallback.
+- **SC-012**: System operates statelessly: there are NO session endpoints, NO logout endpoints, NO concurrent session limits, and NO cookie/token issuance. Multiple requests with the same Basic Auth credentials are independently authenticated. Swagger UI "Logout" removes credentials from client storage only.
+
+## Clarifications
+
+### Session 2026-03-17
+
+- Q1: Should the system defend against brute-force login attempts via rate limiting or backoff? → A: Yes, implement per-email rate limiting with maximum 5 failed attempts per minute, followed by 5–10 minute exponential backoff cooldown.
+- Q2: What uptime SLA and failure handling strategy? → A: Strict SLA approach: target 99.9% monthly uptime with fail-secure semantics (no caching or fallback); database down → HTTP 503 immediately.
+- Q3: Should credential management (password reset, unlock) be in-scope? → A: No, out-of-scope; deferred to future "Admin Dashboard" feature. This feature covers authentication enforcement only.
+- Q4: What is the architectural rationale for Basic Auth vs OAuth2/OIDC? → A: Basic Auth is the permanent and exclusive choice for this monolithic internal API. OAuth2/OIDC are explicitly rejected; federation scenarios (if they arise) must use an external API Gateway/middleware layer, not modify this feature.
+- Q5: How should session/logout/concurrency be handled in Basic Auth? → A: Stateless semantics: each request independently authenticated, no server-side session tracking, no concurrent session limits. Logout is client-side only (credential removal from client storage/Swagger UI).
 
 ## Assumptions
 
@@ -152,8 +205,13 @@ The Swagger/OpenAPI specification documents HTTP Basic authentication as the man
 - Passwords are hashed using bcrypt or Argon2 with at least 10 rounds (bcrypt cost factor).
 - The application will run over HTTPS in production; HTTP is acceptable only for local development.
 - Empleado records are created/updated by admin workflows outside this feature scope.
-- Basic Auth is sufficient for this phase; OAuth2/JWT may be added in future features.
+- **HTTP Basic Authentication is the permanent and exclusive authentication scheme**; OAuth2, OIDC, and token-based auth are explicitly rejected and not planned for this API.
+- If future federation or multi-app scenarios require OAuth2, they MUST be handled by a separate API Gateway/middleware layer; this feature's Basic Auth implementation MUST NOT be modified.
 - Role-based authorization (USER/ADMIN) is already implemented or will be implemented in dependent features.
+- **Password reset, account unlock, and credential revocation are explicitly out-of-scope** and will be handled by future admin/credential management features.
+- Rate-limit lockouts expire automatically after the cooldown period; no administrative unlock necessary.
+- **Stateless authentication model**: The system MUST NOT maintain session state, issue tokens/cookies, or enforce concurrent session limits. Clients (Swagger UI, API clients) MAY cache credentials locally in memory/storage for convenience. Logout is purely client-side (remove credentials from client storage). The server has no logout endpoint or session invalidation mechanism.
+- Each HTTP request containing valid Basic Auth credentials is independently authenticated without reference to prior requests or memory of previous authentications.
 
 ## Open Questions / Clarifications
 
