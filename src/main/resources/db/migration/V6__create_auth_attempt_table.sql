@@ -12,9 +12,7 @@ CREATE TABLE IF NOT EXISTS auth_attempt (
     updated_at TIMESTAMP WITH TIME ZONE NOT NULL DEFAULT CURRENT_TIMESTAMP,
     
     -- Composite key: correo_electronico + IP for per-email+IP tracking
-    CONSTRAINT uk_auth_attempt_correo_ip UNIQUE (correo_electronico, ip_origen),
-    CONSTRAINT fk_auth_attempt_empleado FOREIGN KEY (correo_electronico) 
-        REFERENCES empleado(correo_electronico) ON DELETE CASCADE
+    CONSTRAINT uk_auth_attempt_correo_ip UNIQUE (correo_electronico, ip_origen)
 );
 
 -- Index for efficient cleanup queries

@@ -24,28 +24,28 @@ public class ApiVersionSupportPolicy {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    @Column(nullable = false, length = 100, unique = true)
+    @Column(name = "api_name", nullable = false, length = 100, unique = true)
     private String apiName;
 
-    @Column(nullable = false, length = 10)
+    @Column(name = "deprecated_version", nullable = false, length = 10)
     private String deprecatedVersion;
 
-    @Column(nullable = false, length = 10)
+    @Column(name = "active_version", nullable = false, length = 10)
     private String activeVersion;
 
-    @Column(columnDefinition = "TEXT")
+    @Column(name = "deprecation_notice", columnDefinition = "TEXT")
     private String deprecationNotice;
 
-    @Column(nullable = false)
+    @Column(name = "release_v2_at_utc", nullable = false)
     private OffsetDateTime releaseV2AtUtc;
 
-    @Column(nullable = false)
+    @Column(name = "sunset_at_utc", nullable = false)
     private OffsetDateTime sunsetAtUtc;
 
-    @Column(nullable = false)
+    @Column(name = "created_at", nullable = false)
     private OffsetDateTime createdAt;
 
-    @Column(nullable = false)
+    @Column(name = "updated_at", nullable = false)
     private OffsetDateTime updatedAt;
 
     // Constructors

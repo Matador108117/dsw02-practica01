@@ -40,7 +40,7 @@ public class AuthAttemptService {
         OffsetDateTime now = OffsetDateTime.now();
 
         AuthAttempt attempt = authAttemptRepository
-            .findByCorreoElectronicAndIpOrigen(correoElectronico, ipOrigen)
+            .findByCorreoElectronicoAndIpOrigen(correoElectronico, ipOrigen)
             .orElse(new AuthAttempt(correoElectronico, ipOrigen));
 
         // Check if current window has expired
@@ -77,7 +77,7 @@ public class AuthAttemptService {
      */
     public boolean isBlocked(String correoElectronico, String ipOrigen) {
         return authAttemptRepository
-            .findByCorreoElectronicAndIpOrigen(correoElectronico, ipOrigen)
+            .findByCorreoElectronicoAndIpOrigen(correoElectronico, ipOrigen)
             .map(attempt -> {
                 if (attempt.getBlockedUntil() != null) {
                     return attempt.getBlockedUntil().isAfter(OffsetDateTime.now());
@@ -95,7 +95,7 @@ public class AuthAttemptService {
      */
     public void resetAttempts(String correoElectronico, String ipOrigen) {
         authAttemptRepository
-            .findByCorreoElectronicAndIpOrigen(correoElectronico, ipOrigen)
+            .findByCorreoElectronicoAndIpOrigen(correoElectronico, ipOrigen)
             .ifPresent(attempt -> {
                 attempt.setFailedCountWindow(0);
                 attempt.setBlockedUntil(null);

@@ -16,13 +16,11 @@ spring:
           time_zone: UTC
   flyway:
     enabled: true
+    locations: classpath:db/migration
   jackson:
     deserialization:
       fail-on-unknown-properties: true
     time-zone: UTC
-  jpa:
-    hibernate:
-      ddl-auto: validate
 
 server:
   port: 8080

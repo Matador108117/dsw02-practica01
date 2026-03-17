@@ -109,7 +109,10 @@ public class SecurityConfig {
                 .findByCorreoElectronicoIgnoreCase(bootstrapAdminEmail)
                 .orElse(new Empleado());
 
-            admin.setId(new ClaveEmpleadoId("EMP-", 1L));
+            if (admin.getId() == null) {
+                Long nextConsecutivo = empleadoRepository.nextConsecutivo();
+                admin.setId(new ClaveEmpleadoId("EMP-", nextConsecutivo));
+            }
             admin.setNombre("Bootstrap Admin");
             admin.setDireccion("--");
             admin.setTelefono("--");

@@ -5,17 +5,17 @@ services:
       dockerfile: Dockerfile
     container_name: empleados-api
     environment:
-      DB_URL: jdbc:postgresql://postgres:5432/empleados_db
-      DB_USER: empleados
-      DB_PASSWORD: empleados
-      APP_BOOTSTRAP_ADMIN_EMAIL: admin@empresa.com
-      APP_BOOTSTRAP_ADMIN_PASSWORD: Admin123!
-      APP_TEST_USER_NAME: prueba2
-      APP_TEST_USER_EMAIL: emailprueba@gmail.com
-      APP_TEST_USER_PASSWORD: contra123
-      APP_TEST_USER_ROLE: USER
-      API_RELEASE_V2_UTC: 2026-03-14T00:00:00Z
-      API_SUNSET_V1_UTC: 2026-06-12T00:00:00Z
+      DB_URL: "jdbc:postgresql://postgres:5432/empleados_db"
+      DB_USER: "empleados"
+      DB_PASSWORD: "empleados"
+      APP_BOOTSTRAP_ADMIN_EMAIL: "admin@empresa.com"
+      APP_BOOTSTRAP_ADMIN_PASSWORD: "Admin123!"
+      APP_TEST_USER_NAME: "prueba2"
+      APP_TEST_USER_EMAIL: "emailprueba@gmail.com"
+      APP_TEST_USER_PASSWORD: "contra123"
+      APP_TEST_USER_ROLE: "USER"
+      API_RELEASE_V2_UTC: "2026-03-14T00:00:00Z"
+      API_SUNSET_V1_UTC: "2026-06-12T00:00:00Z"
     ports:
       - "8080:8080"
     depends_on:
@@ -26,9 +26,9 @@ services:
     image: postgres:15
     container_name: empleados-postgres
     environment:
-      POSTGRES_DB: empleados_db
-      POSTGRES_USER: empleados
-      POSTGRES_PASSWORD: empleados
+      POSTGRES_DB: "empleados_db"
+      POSTGRES_USER: "empleados"
+      POSTGRES_PASSWORD: "empleados"
     ports:
       - "5433:5432"
     healthcheck:

@@ -4,6 +4,7 @@ import java.time.OffsetDateTime;
 import java.util.Optional;
 
 import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
@@ -20,11 +21,12 @@ public interface AuthAttemptRepository extends JpaRepository<AuthAttempt, Long> 
     /**
      * Find authentication attempt by correo_electronico and IP origin
      */
-    Optional<AuthAttempt> findByCorreoElectronicAndIpOrigen(String correoElectronico, String ipOrigen);
+    Optional<AuthAttempt> findByCorreoElectronicoAndIpOrigen(String correoElectronico, String ipOrigen);
 
     /**
      * Clean up blocked entries after they expire
      */
+    @Modifying
     @Query("DELETE FROM AuthAttempt a WHERE a.blockedUntil IS NOT NULL AND a.blockedUntil < :now")
     void deleteExpiredBlocks(@Param("now") OffsetDateTime now);
 
