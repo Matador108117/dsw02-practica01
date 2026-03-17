@@ -410,3 +410,82 @@ Relationship: EMPLEADO 1 ──→ ∞ RateLimitState
 
 **Conclusion**: HTTP Basic Auth implementation is a code-only change. Empleado schema already has all required fields. No migrations needed for MVP.
 
+---
+
+## 7. Migration Path: Multi-Instance Scaling with Redis (Future)
+
+### From In-Memory to Distributed Rate-Limiting
+
+**Current State (MVP)**: 
+- `RateLimitService` uses `ConcurrentHashMap<String, RateLimitState>` in-memory
+- Sufficient for single-instance deployment
+- Lost on application restart (acceptable for MVP; rate limits reset on deploy)
+
+**Future State (Multi-Instance Phase)**:
+When scaling to 3+ instances, migrate rate-limit tracking to Redis for shared state across instances.
+
+### Implementation Steps for Scaling
+
+| Step | Change | Impact | Timeline |
+|------|--------|--------|----------|
+| **Phase 3 (MVP)** | In-Memory HashMap (current) | Single-instance only | Weeks 1-4 |
+| **Phase 5** | Add Redis dependency (spring-data-redis) | No API changes; backward compatible | Week 8+ |
+| **Phase 5** | Replace `RateLimitService` internals: HashMap → RedisTemplate | Transparent to filters/controllers | Week 8+ |
+| **Phase 5** | Spring container wires Redis bean based on profile (dev=memory, prod=redis) | Configuration-driven, zero logic changes | Week 8+ |
+
+### Code Pattern for Abstraction
+
+```java
+// RateLimitService interface remains unchanged
+public interface RateLimitService {
+  void recordFailedAttempt(String correo_electronico);
+  void recordSuccessfulAttempt(String correo_electronico);
+  boolean isRateLimited(String correo_electronico);
+}
+
+// MVP Implementation: In-Memory
+@Profile("dev")
+@Component
+public class InMemoryRateLimitService implements RateLimitService {
+  private ConcurrentHashMap<String, RateLimitState> store; // Current
+}
+
+// Future Implementation: Redis
+@Profile("prod")
+@Component
+public class RedisRateLimitService implements RateLimitService {
+  @Autowired private RedisTemplate<String, RateLimitState> redis; // Future
+}
+```
+
+### Benefits of This Abstraction
+
+- ✅ **No breaking changes**: Interface contract never changes
+- ✅ **Feature-parity**: Both implementations have identical behavior
+- ✅ **Easy testing**: Mock RateLimitService in unit tests regardless of backend
+- ✅ **Smooth scaling**: Switch implementations via Spring profile (dev vs prod)
+- ✅ **Future-proof**: Ready for Redis, Memcached, or other backends
+
+### Configuration for Scaling
+
+```yaml
+# application-dev.yml (MVP)
+spring:
+  profiles:
+    active: dev
+rate-limit:
+  backend: memory  # In-memory HashMap
+
+# application-prod.yml (Future)
+spring:
+  profiles:
+    active: prod
+  redis:
+    host: localhost
+    port: 6379
+rate-limit:
+  backend: redis  # Redis cluster
+```
+
+**Conclusion**: MVP uses tested, simple in-memory storage. Migration path to Redis is straightforward via profile-based bean wiring and zero changes to business logic.
+

@@ -64,7 +64,10 @@ This feature implements HTTP Basic Authentication for the Empleados API. Clients
 ### Phase 2: Spring Security Core Configuration
 
 - [ ] T011 [US1] Configure HttpBasic authentication in SecurityConfig.java per Spring Security 6.x standards
-- [ ] T012 [US1] Configure PasswordEncoder bean (bcrypt/Argon2) with configurable work factor
+- [ ] T012 [US1] Configure PasswordEncoder bean with bcrypt as default (work factor 12; Argon2 optional):
+  - [ ] T012a: Implement BCryptPasswordEncoder(12) as primary PasswordEncoder bean
+  - [ ] T012b: Document choice in SecurityConfig comment: "Bcrypt chosen for lower CPU overhead in internal API; Argon2 available as future upgrade"
+  - [ ] T012c: Test password validation with bcrypt hashes containing each cost factor (10, 12, 14)
 - [ ] T013 [US1] Register EmpleadoUserDetailsService as UserDetailsService bean
 - [ ] T014 [US1] Configure SecurityFilterChain to enforce HTTP Basic on `/api/v2/**` endpoints
 - [ ] T015 [US1] Exclude public endpoints (health checks, actuator) from authentication requirement
@@ -77,8 +80,8 @@ This feature implements HTTP Basic Authentication for the Empleados API. Clients
 ### Phase 3: Service Layer - Authentication Logic
 
 - [ ] T021 [US1] Implement EmpleadoUserDetailsService.loadUserByUsername(email) to:
-  - [ ] T021a: Query `empleado` table by `correo_electronico` (case-insensitive)
-  - [ ] T021b: Throw UsernameNotFoundException if email not found (return generic error, don't leak email existence)
+  - [ ] T021a: Query `empleado` table by `correo_electronico` (case-insensitive per RFC 5321; use PostgreSQL LOWER() or Java equalsIgnoreCase() with UTF-8 support for accented characters)
+  - [ ] T021b: Throw UsernameNotFoundException if correo_electronico not found (return generic error, don't leak email existence)
   - [ ] T021c: Load Empleado entity with `activo=true` check
   - [ ] T021d: Build UserDetails from Empleado with roles (USER, ADMIN)
   - [ ] T021e: Return UserDetails with `contrasena_hash` for PasswordEncoder validation
@@ -173,14 +176,15 @@ This feature implements HTTP Basic Authentication for the Empleados API. Clients
 ### Phase 9: Integration Tests - Rate-Limiting & Brute-Force Defense (US2)
 
 - [ ] T049 [US2] Create RateLimitIntegrationTest.java:
-  - [ ] T049a: Execute 5 failed login attempts for same email within 1 minute
+  - [ ] T049a: Execute 5 failed login attempts for same correo_electronico within 1 minute
   - [ ] T049b: Verify 5th attempt still returns HTTP 401, not HTTP 429
   - [ ] T049c: Verify 6th attempt within window returns HTTP 429 Too Many Requests
   - [ ] T049d: Verify 60-second window resets after 1 minute; retry succeeds after cooldown
-  - [ ] T049e: Verify successful login resets failed attempt counter for that email
+  - [ ] T049e: Verify successful login resets failed attempt counter for that correo_electronico
   - [ ] T049f: Test exponential backoff: 1st lockout 5 min, 2nd lockout 10 min
-  - [ ] T049g: Test concurrent requests from different emails: each email has independent counter
-  - [ ] T049h: Test concurrent requests from same email during rate-limit window
+  - [ ] T049g: Test concurrent requests from different correo_electronico values: each has independent counter
+  - [ ] T049h: Test concurrent requests from same correo_electronico during rate-limit window
+  - [ ] T049i: **(Finding A1) UTF-8 Test**: Test case-insensitive correo_electronico lookup with accented characters (josé@example.com, müller@example.com, joão@example.com); verify both lowercase/uppercase variants authenticate; verify rate-limit counter is correctly scoped per RFC 5321
 
 ### Phase 10: Integration Tests - Service Failure & Fail-Secure Handling (US1, US2)
 

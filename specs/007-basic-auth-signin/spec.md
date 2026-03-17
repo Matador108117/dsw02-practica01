@@ -22,11 +22,11 @@
 
 ### User Story 1 - Authenticate with Valid Email and Password (Priority: P1)
 
-API clients (including Swagger UI) send HTTP requests with Basic Auth credentials (email:password). The system decodes the credentials, searches for an empleado record by `correo_electronico`, validates the provided password against the stored `contrasena_hash` using secure hash comparison, and authenticates the client if credentials match.
+API clients (including Swagger UI) send HTTP requests with Basic Auth credentials (correo_electronico:password). The system decodes the credentials, searches for an empleado record by `correo_electronico`, validates the provided password against the stored `contrasena_hash` using secure hash comparison, and authenticates the client if credentials match.
 
 **Why this priority**: This is the core authentication flow; without it, no user can access protected endpoints.
 
-**Independent Test**: Can be tested by sending a valid Basic Auth header with email:password and verifying HTTP 200 response from a protected endpoint, independent of other features.
+**Independent Test**: Can be tested by sending a valid Basic Auth header with correo_electronico:password and verifying HTTP 200 response from a protected endpoint, independent of other features.
 
 **Acceptance Scenarios**:
 
@@ -97,7 +97,7 @@ The Swagger/OpenAPI specification documents HTTP Basic authentication as the man
 - **FR-010**: System MUST document security requirement (HTTPS mandatory) in feature spec and migration notes.
 - **FR-011**: System MUST apply HTTP Basic authentication to ALL protected endpoints unless feature spec explicitly marks endpoint as public with constitutional justification.
 - **FR-012**: System MUST log authentication attempts (success/failure) with email and timestamp for security auditing.
-- **FR-013**: System MUST implement brute-force protection by rate-limiting failed authentication attempts: maximum 5 failed attempts per email per minute, followed by exponential backoff (5–10 minute temporary lock) on that email address.
+- **FR-013**: System MUST implement brute-force protection by rate-limiting failed authentication attempts: maximum 5 failed attempts per correo_electronico per minute, followed by exponential backoff (5–10 minute temporary lock) on that correo_electronico.
 - **FR-014**: System MUST explicitly exclude password reset, account unlock, and credential administration endpoints from scope. These capabilities are deferred to a future "Admin Dashboard" or "Credential Management" feature.
 - **FR-015**: System MUST operate as **stateless** with respect to authentication: each HTTP request containing a valid `Authorization: Basic` header is independently authenticated without server-side session state. Clients MAY cache credentials locally (e.g., in Swagger UI browser storage); logout is a client-side operation (credential removal from client storage). Server MUST NOT implement session tracking, token issuance, or concurrent session limits.
 
@@ -121,7 +121,7 @@ The Swagger/OpenAPI specification documents HTTP Basic authentication as the man
 - **BC-014**: Password comparison MUST use constant-time comparison to prevent timing attacks (e.g., `javax.crypto.Cipher` or Spring Security's `PasswordEncoder.matches()`).
 - **BC-015**: Credentials MUST NOT appear in logs, error messages, or API responses; only email (for auditing) and generic "invalid credentials" may be logged.
 - **BC-016**: Basic Auth transmission MUST be over HTTPS in production; HTTP MUST only be used for local development/testing with clear warnings.
-- **BC-017**: Rate limiting MUST be implemented per email address (not per IP): track failed attempts, allow maximum 5 per minute, and apply exponential backoff cooldown (5–10 minutes) on lockout; successful authentication MUST reset the failed attempt counter for that email.
+- **BC-017**: Rate limiting MUST be implemented per correo_electronico address (not per IP): track failed attempts, allow maximum 5 per minute, and apply exponential backoff cooldown (5–10 minutes) on lockout; successful authentication MUST reset the failed attempt counter for that correo_electronico.
 - **BC-018**: System failures (database unavailable, auth service down) MUST NOT trigger fallback/bypass mechanisms; instead, authentication requests MUST fail fast with HTTP 503 (Service Unavailable) within 1 second without attempting any access or caching credentials.
 - **BC-019**: HTTP Basic Authentication is the permanent and exclusive authentication scheme for this API. OAuth2, OIDC, JWT, and token-based authentication are explicitly NOT supported and are NOT planned for future introduction to this endpoint. Federation and multi-app scenarios requiring OAuth2 MUST use a separate API gateway or middleware layer; they MUST NOT drive changes to this feature's authentication model.
 - **BC-020**: Authentication is **stateless**: the system MUST NOT implement session management, session tokens, cookies, or concurrent session limits. Each request is independently authenticated by decoding and validating the `Authorization: Basic` header. Logout is a client-side operation (credential removal from client storage); the server has no logout endpoint or session invalidation logic.
