@@ -106,6 +106,8 @@
   DB, and API contract.
 - **BC-008**: Public API endpoints MUST be versioned with `/api/v{major}` and
   breaking changes MUST declare migration impact.
+- **BC-008a**: Any public contract expansion or addition of public endpoints MUST
+  trigger a major API version increment.
 - **BC-009**: Collection endpoints MUST define pagination parameters plus default and
   maximum page limits.
 - **BC-010**: Implementation workflow MUST define feature branch, PR traceability,
@@ -116,6 +118,10 @@
   in plaintext.
 - **BC-013**: Deprecated API versions past sunset MUST respond `410 Gone`, with UTC
   as the business clock for cutoff evaluation.
+- **BC-014**: When `Departamento` is in scope, model integrity MUST enforce:
+  `Departamento (1) -> (N) Empleados`, employee belongs to at most one department,
+  and employee department assignment MAY be null.
+- **BC-015**: Implicit relationships without declared FK constraints are forbidden.
 
 *Example of marking unclear requirements:*
 
@@ -126,6 +132,9 @@
 
 - **[Entity 1]**: [What it represents, key attributes without implementation]
 - **[Entity 2]**: [What it represents, relationships to other entities]
+
+When feature scope includes domain relationships, this section MUST explicitly
+document cardinality, nullable assignment rules, and FK expectations.
 
 ## Success Criteria *(mandatory)*
 

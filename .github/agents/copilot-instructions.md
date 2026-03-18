@@ -26,9 +26,9 @@ tests/
 Java 17: Follow standard conventions
 
 ## Recent Changes
+- 008-api-v3-departamentos: Added Java 17 + Spring Boot 3, Spring Security, Spring Data JPA, springdoc-openapi
 - 007-basic-auth-signin: Added Java 17 + Spring Boot 3.4.2, Spring Security (HTTP Basic + PasswordEncoder), Spring Data JPA, springdoc-openapi 2.8.4, Bcrypt/Argon2 for password hashing, Flyway for DB migrations
 - 001-swagger-global-auth: Added Java 17 + Spring Boot 3, Spring Security, Spring Data JPA,
-- 004-empleado-auth-roles: Added Java 17 + Spring Boot 3, Spring Security, Spring Data JPA,
 
 
 <!-- MANUAL ADDITIONS START -->

@@ -2,6 +2,8 @@ package com.dsw02.empleados.repository;
 
 import java.util.Optional;
 
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
@@ -23,4 +25,8 @@ public interface EmpleadoRepository extends JpaRepository<Empleado, ClaveEmplead
      */
     @Query("SELECT e FROM Empleado e WHERE LOWER(e.correoElectronico) = LOWER(:correo)")
     Optional<Empleado> findByCorreoElectronicoIgnoreCase(@Param("correo") String correoElectronico);
+
+    boolean existsByDepartamento_Id(String departamentoId);
+
+    Page<Empleado> findByDepartamento_Id(String departamentoId, Pageable pageable);
 }

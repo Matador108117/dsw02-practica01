@@ -12,8 +12,10 @@ import com.dsw02.empleados.controller.dto.EmpleadoDtos.EmpleadoCreateRequest;
 import com.dsw02.empleados.controller.dto.EmpleadoDtos.EmpleadoResponse;
 import com.dsw02.empleados.controller.dto.EmpleadoDtos.EmpleadoUpdateRequest;
 import com.dsw02.empleados.model.ClaveEmpleadoId;
+import com.dsw02.empleados.model.Departamento;
 import com.dsw02.empleados.model.Empleado;
 import com.dsw02.empleados.model.Rol;
+import com.dsw02.empleados.repository.DepartamentoRepository;
 import com.dsw02.empleados.repository.EmpleadoRepository;
 
 @Service
@@ -25,17 +27,20 @@ public class EmpleadoServiceImpl implements EmpleadoService {
     private final ClaveEmpleadoFormatter formatter;
     private final ClaveEmpleadoParser parser;
     private final PasswordEncoder passwordEncoder;
+    private final DepartamentoRepository departamentoRepository;
 
     public EmpleadoServiceImpl(
         EmpleadoRepository repository,
         ClaveEmpleadoFormatter formatter,
         ClaveEmpleadoParser parser,
-        PasswordEncoder passwordEncoder
+        PasswordEncoder passwordEncoder,
+        DepartamentoRepository departamentoRepository
     ) {
         this.repository = repository;
         this.formatter = formatter;
         this.parser = parser;
         this.passwordEncoder = passwordEncoder;
+        this.departamentoRepository = departamentoRepository;
     }
 
     @Override
@@ -61,6 +66,7 @@ public class EmpleadoServiceImpl implements EmpleadoService {
         // Set role (default to USER if not provided)
         empleado.setRol(request.rol() != null ? request.rol() : Rol.USER);
         empleado.setActivo(true);
+        empleado.setDepartamento(resolveDepartamento(request.departamentoId()));
 
         Empleado saved = repository.save(empleado);
         EmpleadoResponse response = toResponse(saved);
@@ -112,6 +118,9 @@ public class EmpleadoServiceImpl implements EmpleadoService {
         if (request.activo() != null) {
             empleado.setActivo(request.activo());
         }
+        if (request.departamentoId() != null) {
+            empleado.setDepartamento(resolveDepartamento(request.departamentoId()));
+        }
 
         Empleado saved = repository.save(empleado);
         EmpleadoResponse response = toResponse(saved);
@@ -140,7 +149,17 @@ public class EmpleadoServiceImpl implements EmpleadoService {
             empleado.getTelefono(),
             empleado.getCorreoElectronico(),
             empleado.getRol().name(),
-            empleado.getActivo()
+            empleado.getActivo(),
+            empleado.getDepartamento() == null ? null : empleado.getDepartamento().getId()
         );
+    }
+
+    private Departamento resolveDepartamento(String departamentoId) {
+        if (departamentoId == null || departamentoId.isBlank()) {
+            return null;
+        }
+
+        return departamentoRepository.findById(departamentoId)
+            .orElseThrow(() -> new InvalidDepartamentoReferenceException(departamentoId));
     }
 }

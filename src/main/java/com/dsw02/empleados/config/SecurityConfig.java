@@ -10,6 +10,7 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.http.HttpMethod;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.dao.DaoAuthenticationProvider;
 import org.springframework.security.config.Customizer;
@@ -21,6 +22,7 @@ import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.web.SecurityFilterChain;
+import org.springframework.security.web.authentication.www.BasicAuthenticationFilter;
 import com.dsw02.empleados.service.EmpleadoUserDetailsService;
 
 import java.time.OffsetDateTime;
@@ -35,6 +37,7 @@ public class SecurityConfig {
     private static final Logger log = LoggerFactory.getLogger(SecurityConfig.class);
     private final EmpleadoRepository empleadoRepository;
     private final ApiVersionSupportPolicyService versionPolicyService;
+    private final ApiVersionSunsetFilter apiVersionSunsetFilter;
 
     @Value("${app.bootstrap-admin.email:admin@empresa.com}")
     private String bootstrapAdminEmail;
@@ -51,10 +54,12 @@ public class SecurityConfig {
     @Value("${app.api-version.sunset-v1-utc:2026-06-12T00:00:00Z}")
     private String sunsetV1UtcString;
 
-    public SecurityConfig(EmpleadoRepository empleadoRepository, 
-                         ApiVersionSupportPolicyService versionPolicyService) {
+    public SecurityConfig(EmpleadoRepository empleadoRepository,
+                         ApiVersionSupportPolicyService versionPolicyService,
+                         ApiVersionSunsetFilter apiVersionSunsetFilter) {
         this.empleadoRepository = empleadoRepository;
         this.versionPolicyService = versionPolicyService;
+        this.apiVersionSunsetFilter = apiVersionSunsetFilter;
     }
 
     @Bean
@@ -70,8 +75,17 @@ public class SecurityConfig {
                 .requestMatchers("/v3/api-docs/**", "/swagger-ui/**", "/swagger-ui.html", 
                     "/swagger-ui.css", "/swagger-ui-*.js", "/swagger-ui-*.css").permitAll()
                 .requestMatchers("/actuator/**").permitAll()
+                .requestMatchers(HttpMethod.GET, "/api/v2/empleados/**", "/api/v3/empleados/**", "/api/v3/departamentos/**")
+                    .hasAnyRole("ADMIN", "USER")
+                .requestMatchers(HttpMethod.POST, "/api/v2/empleados/**", "/api/v3/empleados/**", "/api/v3/departamentos/**")
+                    .hasRole("ADMIN")
+                .requestMatchers(HttpMethod.PUT, "/api/v2/empleados/**", "/api/v3/empleados/**", "/api/v3/departamentos/**")
+                    .hasRole("ADMIN")
+                .requestMatchers(HttpMethod.DELETE, "/api/v2/empleados/**", "/api/v3/empleados/**", "/api/v3/departamentos/**")
+                    .hasRole("ADMIN")
                 .anyRequest().authenticated()
             )
+            .addFilterBefore(apiVersionSunsetFilter, BasicAuthenticationFilter.class)
             .httpBasic(Customizer.withDefaults());
 
         return http.build();

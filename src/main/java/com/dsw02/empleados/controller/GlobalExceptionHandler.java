@@ -1,8 +1,5 @@
 package com.dsw02.empleados.controller;
 
-import com.dsw02.empleados.controller.dto.EmpleadoDtos.ErrorResponse;
-import com.dsw02.empleados.service.EmpleadoNotFoundException;
-import jakarta.validation.ConstraintViolationException;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.http.converter.HttpMessageNotReadableException;
@@ -10,6 +7,14 @@ import org.springframework.validation.FieldError;
 import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
+
+import com.dsw02.empleados.controller.dto.EmpleadoDtos.ErrorResponse;
+import com.dsw02.empleados.service.DepartamentoConflictException;
+import com.dsw02.empleados.service.DepartamentoNotFoundException;
+import com.dsw02.empleados.service.EmpleadoNotFoundException;
+import com.dsw02.empleados.service.InvalidDepartamentoReferenceException;
+
+import jakarta.validation.ConstraintViolationException;
 
 @RestControllerAdvice
 public class GlobalExceptionHandler {
@@ -29,5 +34,20 @@ public class GlobalExceptionHandler {
     @ExceptionHandler(EmpleadoNotFoundException.class)
     public ResponseEntity<ErrorResponse> handleNotFound(EmpleadoNotFoundException exception) {
         return ResponseEntity.status(HttpStatus.NOT_FOUND).body(new ErrorResponse("NOT_FOUND", exception.getMessage()));
+    }
+
+    @ExceptionHandler(DepartamentoNotFoundException.class)
+    public ResponseEntity<ErrorResponse> handleDepartamentoNotFound(DepartamentoNotFoundException exception) {
+        return ResponseEntity.status(HttpStatus.NOT_FOUND).body(new ErrorResponse("NOT_FOUND", exception.getMessage()));
+    }
+
+    @ExceptionHandler(DepartamentoConflictException.class)
+    public ResponseEntity<ErrorResponse> handleConflict(DepartamentoConflictException exception) {
+        return ResponseEntity.status(HttpStatus.CONFLICT).body(new ErrorResponse("CONFLICT", exception.getMessage()));
+    }
+
+    @ExceptionHandler(InvalidDepartamentoReferenceException.class)
+    public ResponseEntity<ErrorResponse> handleUnprocessable(InvalidDepartamentoReferenceException exception) {
+        return ResponseEntity.unprocessableEntity().body(new ErrorResponse("UNPROCESSABLE_ENTITY", exception.getMessage()));
     }
 }

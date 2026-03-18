@@ -73,8 +73,13 @@ Examples of foundational tasks (adjust based on your project):
   authentication by hash comparison against `contrasena_hash`
 - [ ] T008 [P] Setup API routing and global exception handling
 - [ ] T009 [P] Establish API versioning baseline (`/api/v1`) and route conventions
+- [ ] T009a [P] If public contract expands or new public endpoints are added,
+  create tasks to increment API major version and update migration notes/OpenAPI
 - [ ] T009a [P] Implement UTC-based sunset enforcement for deprecated versions
   with `410 Gone` response behavior
+- [ ] T009b [P] For Department-domain scope, add schema/model tasks for explicit
+  FK-backed `Departamento (1) -> (N) Empleados` relation with nullable employee
+  department assignment
 - [ ] T010 [P] Define reusable pagination request/response model and defaults
 - [ ] T011 Create base entities/repositories shared by user stories
 - [ ] T012 Configure structured logging and environment configuration

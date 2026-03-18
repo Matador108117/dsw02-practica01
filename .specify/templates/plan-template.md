@@ -28,7 +28,10 @@
 methods using `correo_electronico` as username and transient `contrasena`
 validated against persisted `contrasena_hash`, role-based access (`USER`
 read-only, `ADMIN` CRUD), OpenAPI/Swagger required, Docker parity for DB,
-API major versioning (`/api/v{major}`), paginated list endpoints, feature-branch + PR workflow  
+API major versioning (`/api/v{major}`), mandatory major bump when public contract
+changes or new public endpoints are introduced, paginated list endpoints,
+explicit FK-backed relational integrity for `Departamento (1) -> (N) Empleados`
+with nullable employee assignment, feature-branch + PR workflow  
 **Scale/Scope**: Define per feature with expected API and data volume
 
 ## Constitution Check
@@ -49,6 +52,10 @@ API major versioning (`/api/v{major}`), paginated list endpoints, feature-branch
   are planned.
 - Versioning gate: API path version impact is documented (`/api/v{major}`) and
   breaking changes include migration notes.
+- Contract evolution gate: Public contract expansion or new endpoints explicitly
+  trigger major version increment (for Department-domain rollout: `v3` or newer).
+- Relational integrity gate: Features touching Department-Employee relation define
+  explicit FK rules and nullable employee assignment semantics.
 - Sunset gate: Deprecated version cutoff behavior is documented and enforces
   `410 Gone` using UTC as business clock.
 - Pagination gate: List endpoints define defaults, max limits, and validation tests.

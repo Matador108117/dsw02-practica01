@@ -21,8 +21,9 @@ public abstract class BasePostgresIT {
         registry.add("spring.datasource.url", postgres::getJdbcUrl);
         registry.add("spring.datasource.username", postgres::getUsername);
         registry.add("spring.datasource.password", postgres::getPassword);
-        registry.add("app.security.username", () -> "admin");
-        registry.add("app.security.password", () -> "admin123");
+        registry.add("app.bootstrap-admin.email", () -> "admin@empresa.com");
+        registry.add("app.bootstrap-admin.password", () -> "Admin123!");
+        registry.add("app.bootstrap-admin.only-once", () -> "true");
     }
 
     @BeforeEach

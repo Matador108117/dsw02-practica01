@@ -1,5 +1,7 @@
 package com.dsw02.empleados.controller.dto;
 
+import java.util.List;
+
 import com.dsw02.empleados.model.Rol;
 
 import jakarta.validation.constraints.Email;
@@ -21,7 +23,8 @@ public final class EmpleadoDtos {
         @NotBlank @Size(max = 100) String telefono,
         @NotBlank @Email @Size(max = 150) String correoElectronico,
         @NotBlank @Size(min = 8, max = 255) String contrasena,
-        Rol rol  // Optional, defaults to USER if null
+        Rol rol,  // Optional, defaults to USER if null
+        @Size(max = 10) String departamentoId
     ) {
     }
 
@@ -36,7 +39,8 @@ public final class EmpleadoDtos {
         @Email @Size(max = 150) String correoElectronico,
         @Size(min = 8, max = 255) String contrasena,  // Optional; NULL means keep existing hash
         Rol rol,
-        Boolean activo
+        Boolean activo,
+        @Size(max = 10) String departamentoId
     ) {
     }
 
@@ -53,7 +57,17 @@ public final class EmpleadoDtos {
         String telefono,
         String correoElectronico,
         String rol,
-        Boolean activo
+        Boolean activo,
+        String departamentoId
+    ) {
+    }
+
+    public record EmpleadoPageResponse(
+        List<EmpleadoResponse> content,
+        int page,
+        int size,
+        long totalElements,
+        int totalPages
     ) {
     }
 

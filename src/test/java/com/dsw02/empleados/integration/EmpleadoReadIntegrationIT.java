@@ -27,7 +27,7 @@ class EmpleadoReadIntegrationIT extends BasePostgresIT {
 
     @Test
     void shouldReturn404ForMissingKey() throws Exception {
-        mockMvc.perform(get("/api/v2/empleados/{clave}", "EMP-999999").with(httpBasic("admin", "admin123")))
+        mockMvc.perform(get("/api/v2/empleados/{clave}", "EMP-999999").with(httpBasic("admin@empresa.com", "Admin123!")))
             .andExpect(status().isNotFound());
     }
 
@@ -36,18 +36,20 @@ class EmpleadoReadIntegrationIT extends BasePostgresIT {
         String payload = objectMapper.writeValueAsString(Map.of(
             "nombre", "Luis",
             "direccion", "Sur",
-            "telefono", "5544444444"
+            "telefono", "5544444444",
+            "correoElectronico", "luis.integration@example.com",
+            "contrasena", "Password123!"
         ));
 
         MvcResult created = mockMvc.perform(post("/api/v2/empleados")
-                .with(httpBasic("admin", "admin123"))
+                .with(httpBasic("admin@empresa.com", "Admin123!"))
                 .contentType(MediaType.APPLICATION_JSON)
                 .content(payload))
             .andExpect(status().isCreated())
             .andReturn();
 
         String clave = objectMapper.readTree(created.getResponse().getContentAsString()).get("clave").asText();
-        mockMvc.perform(get("/api/v2/empleados/{clave}", clave).with(httpBasic("admin", "admin123")))
+        mockMvc.perform(get("/api/v2/empleados/{clave}", clave).with(httpBasic("admin@empresa.com", "Admin123!")))
             .andExpect(status().isOk());
     }
 }

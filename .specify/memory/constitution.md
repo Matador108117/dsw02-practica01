@@ -1,18 +1,19 @@
 <!--
 Sync Impact Report
-- Version change: 3.1.0 -> 3.2.0
+- Version change: 3.1.0 -> 4.0.0
 - Modified principles:
-	- None
+	- VI. API Versioning Compatibility -> VI. API Versioning Compatibility (clarified mandatory major bump for public contract changes)
+	- III. PostgreSQL + Docker by Default -> III. PostgreSQL + Docker by Default (expanded relational/FK obligations)
 - Added sections:
-	- IX. Automated Agent Workflow Discipline
+	- X. Domain Relational Integrity (Departamento-Empleado)
 - Removed sections:
 	- None
 - Templates requiring updates:
-	- ✅ verified: .specify/templates/plan-template.md (no changes needed)
-	- ✅ verified: .specify/templates/spec-template.md (no changes needed)
-	- ✅ verified: .specify/templates/tasks-template.md (no changes needed)
+	- ✅ updated: .specify/templates/plan-template.md
+	- ✅ updated: .specify/templates/spec-template.md
+	- ✅ updated: .specify/templates/tasks-template.md
 	- ✅ verified: .specify/templates/commands/*.md (directory not present)
-	- ✅ verified: runtime guidance docs
+	- ✅ updated: .github/agents/copilot-instructions.md
 - Follow-up TODOs:
 	- None
 -->
@@ -52,6 +53,8 @@ Docker-based database runtime (for example Docker Compose) to guarantee reproduc
 environments. The `empleado` table schema MUST enforce non-null
 `correo_electronico` and non-null `contrasena_hash` columns for all records.
 `contrasena` plaintext MUST NOT be stored in any persistent database column.
+Schema relations MUST be explicit using declared foreign keys when an entity
+references another persisted entity.
 Rationale: consistent runtime parity avoids environment-specific defects and
 guarantees security-critical identity data integrity.
 
@@ -75,6 +78,13 @@ changes MUST preserve existing version behavior. When a deprecated version reach
 declared sunset timestamp, requests to that version MUST return `410 Gone` and MUST be
 enforced automatically with UTC as the only business clock. Rationale: explicit API
 versioning protects clients from accidental breaking changes.
+
+Any change that modifies the public contract (request/response shape, entity graph,
+or route set), or adds new public endpoints, SHALL be treated as backward-incompatible
+for governance and MUST trigger a major API version increment.
+
+Current official public major for the domain model that includes `Departamento` is
+`v3`.
 
 ### VII. API Pagination by Default
 All collection/list endpoints MUST implement pagination with explicit request parameters
@@ -104,6 +114,25 @@ in visible task tracking and summaries before continuing. Rationale: predictable
 behavior ensures that implementation phases complete reliably even in multi-process
 environments, and explicit instruction prevents accidental task abandonment.
 
+### X. Domain Relational Integrity (Departamento-Empleado)
+The official domain model includes `Departamento` as a persisted entity.
+
+Relational rules are mandatory:
+- A `Departamento` MAY have multiple `Empleado` records.
+- An `Empleado` MUST reference at most one `Departamento`.
+- An `Empleado` MAY be created or updated without department assignment
+	(`departamento_id` nullable), but when assignment exists it MUST reference a
+	valid persisted `Departamento` row.
+- Implicit relations without declared foreign key constraints are forbidden.
+
+Contract evolution rules are mandatory:
+- Features introducing `Departamento` resources or department-related employee
+	projections MUST publish contract updates in OpenAPI and migration notes.
+- These changes MUST ship under API major `v3` or later, never under older majors.
+
+Rationale: explicit relational integrity prevents orphaned references and keeps API
+and persistence behavior deterministic under schema evolution.
+
 ## Technical Constraints
 
 - Runtime MUST be Java 17.
@@ -122,8 +151,15 @@ environments, and explicit instruction prevents accidental task abandonment.
   attributes.
 - `contrasena` MUST be input-only and MUST NOT persist in plaintext.
 - Public API routes MUST be major-versioned (`/api/v{major}`).
+- Public contract expansion or new public endpoints MUST force API major increment.
+- Official API major for features including `Departamento` MUST be `v3` or newer.
 - Deprecated API versions past sunset MUST return `410 Gone` under UTC time.
 - List endpoints MUST define default and maximum pagination limits.
+- `departamento` persistence MUST exist as first-class entity when that domain is in
+	scope, with explicit FK from `empleado` to `departamento` when assigned.
+- `empleado` to `departamento` association MUST be nullable at creation/update but
+	MUST be referentially valid when present.
+- Implicit inter-entity joins without declared FK are forbidden.
 - Development workflow MUST use feature branches and PR-based integration.
 
 ## Delivery Workflow and Quality Gates
@@ -143,6 +179,9 @@ environments, and explicit instruction prevents accidental task abandonment.
 - Pull requests MUST document API version and pagination impacts when endpoints change.
 - Pull requests that modify versioning MUST include evidence of sunset enforcement
 	(`410 Gone`) and UTC-based cutoff behavior.
+- Pull requests that introduce or modify `Departamento` domain behavior MUST include
+  FK/migration evidence, nullable assignment behavior for `empleado`, and
+  contract-level examples for the resulting major API version.
 - A feature is not complete until HTTP Basic auth (email as username with
 	hash-based password verification), role-based authorization,
 	PostgreSQL (Docker), and Swagger evidence is present in code and documentation.
@@ -171,9 +210,11 @@ Agent Compliance:
 
 Compliance review policy:
 - Every feature plan MUST pass a constitution gate before implementation starts.
-- Every pull request MUST confirm compliance with all eight principles, including the
+
+- Every pull request MUST confirm compliance with all ten principles, including the
 	role policy (`USER` read-only, `ADMIN` CRUD), HTTP Basic auth semantics,
-	secure password-hash persistence, and required employee identity fields.
+	secure password-hash persistence, required employee identity fields, and
+	`Departamento` relational integrity rules.
 - Violations MUST be tracked with rationale and remediation tasks before approval.
 
-**Version**: 3.1.0 | **Ratified**: 2026-02-25 | **Last Amended**: 2026-03-14
+**Version**: 4.0.0 | **Ratified**: 2026-02-25 | **Last Amended**: 2026-03-17

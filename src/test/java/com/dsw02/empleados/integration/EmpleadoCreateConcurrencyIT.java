@@ -37,7 +37,8 @@ class EmpleadoCreateConcurrencyIT extends BasePostgresIT {
                 "55000000" + index,
                 "user" + index + "@example.com",
                 "Password!" + index,
-                Rol.USER
+                Rol.USER,
+                null
             )).clave());
         }
 
