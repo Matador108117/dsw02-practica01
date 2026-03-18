@@ -40,7 +40,7 @@ class EmpleadoCreateIntegrationIT extends BasePostgresIT {
             "contrasena", "Password123!"
         ));
 
-        mockMvc.perform(post("/api/v2/empleados")
+        mockMvc.perform(post("/api/v3/empleados")
                 .with(httpBasic("admin@empresa.com", "Admin123!"))
                 .contentType(MediaType.APPLICATION_JSON)
                 .content(payload))

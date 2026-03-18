@@ -1,10 +1,7 @@
 package com.dsw02.empleados.config;
 
-import com.dsw02.empleados.model.ClaveEmpleadoId;
-import com.dsw02.empleados.model.Empleado;
-import com.dsw02.empleados.model.Rol;
-import com.dsw02.empleados.repository.EmpleadoRepository;
-import com.dsw02.empleados.service.ApiVersionSupportPolicyService;
+import java.time.OffsetDateTime;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Value;
@@ -23,9 +20,12 @@ import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.web.authentication.www.BasicAuthenticationFilter;
-import com.dsw02.empleados.service.EmpleadoUserDetailsService;
 
-import java.time.OffsetDateTime;
+import com.dsw02.empleados.model.ClaveEmpleadoId;
+import com.dsw02.empleados.model.Empleado;
+import com.dsw02.empleados.model.Rol;
+import com.dsw02.empleados.repository.EmpleadoRepository;
+import com.dsw02.empleados.service.ApiVersionSupportPolicyService;
 
 /**
  * Spring Security configuration for HTTP Basic Authentication with role-based authorization.
@@ -75,13 +75,13 @@ public class SecurityConfig {
                 .requestMatchers("/v3/api-docs/**", "/swagger-ui/**", "/swagger-ui.html", 
                     "/swagger-ui.css", "/swagger-ui-*.js", "/swagger-ui-*.css").permitAll()
                 .requestMatchers("/actuator/**").permitAll()
-                .requestMatchers(HttpMethod.GET, "/api/v2/empleados/**", "/api/v3/empleados/**", "/api/v3/departamentos/**")
+                .requestMatchers(HttpMethod.GET, "/api/v3/empleados/**", "/api/v3/departamentos/**")
                     .hasAnyRole("ADMIN", "USER")
-                .requestMatchers(HttpMethod.POST, "/api/v2/empleados/**", "/api/v3/empleados/**", "/api/v3/departamentos/**")
+                .requestMatchers(HttpMethod.POST, "/api/v3/empleados/**", "/api/v3/departamentos/**")
                     .hasRole("ADMIN")
-                .requestMatchers(HttpMethod.PUT, "/api/v2/empleados/**", "/api/v3/empleados/**", "/api/v3/departamentos/**")
+                .requestMatchers(HttpMethod.PUT, "/api/v3/empleados/**", "/api/v3/departamentos/**")
                     .hasRole("ADMIN")
-                .requestMatchers(HttpMethod.DELETE, "/api/v2/empleados/**", "/api/v3/empleados/**", "/api/v3/departamentos/**")
+                .requestMatchers(HttpMethod.DELETE, "/api/v3/empleados/**", "/api/v3/departamentos/**")
                     .hasRole("ADMIN")
                 .anyRequest().authenticated()
             )

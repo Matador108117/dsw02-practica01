@@ -37,7 +37,7 @@ class EmpleadoUpdateDeleteIntegrationIT extends BasePostgresIT {
             "contrasena", "Password123!"
         ));
 
-        MvcResult created = mockMvc.perform(post("/api/v2/empleados")
+        MvcResult created = mockMvc.perform(post("/api/v3/empleados")
                 .with(httpBasic("admin@empresa.com", "Admin123!"))
                 .contentType(MediaType.APPLICATION_JSON)
                 .content(createPayload))
@@ -52,13 +52,13 @@ class EmpleadoUpdateDeleteIntegrationIT extends BasePostgresIT {
             "telefono", "5666666666"
         ));
 
-        mockMvc.perform(put("/api/v2/empleados/{clave}", clave)
+        mockMvc.perform(put("/api/v3/empleados/{clave}", clave)
                 .with(httpBasic("admin@empresa.com", "Admin123!"))
                 .contentType(MediaType.APPLICATION_JSON)
                 .content(updatePayload))
             .andExpect(status().isOk());
 
-        mockMvc.perform(delete("/api/v2/empleados/{clave}", clave)
+        mockMvc.perform(delete("/api/v3/empleados/{clave}", clave)
                 .with(httpBasic("admin@empresa.com", "Admin123!")))
             .andExpect(status().isNoContent());
     }

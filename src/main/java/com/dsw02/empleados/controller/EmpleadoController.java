@@ -28,7 +28,7 @@ import io.swagger.v3.oas.annotations.security.SecurityRequirement;
 import jakarta.validation.Valid;
 
 @RestController
-@RequestMapping({"/api/v2/empleados", "/api/v3/empleados"})
+@RequestMapping("/api/v3/empleados")
 @SecurityRequirement(name = "basicAuth")
 public class EmpleadoController {
 
