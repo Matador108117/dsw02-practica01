@@ -1,7 +1,6 @@
 package com.dsw02.empleados.controller;
 
 import java.net.URI;
-import java.util.List;
 
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
@@ -12,15 +11,16 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.dsw02.empleados.controller.dto.EmpleadoDtos.EmpleadoCreateRequest;
+import com.dsw02.empleados.controller.dto.EmpleadoDtos.EmpleadoPageResponse;
 import com.dsw02.empleados.controller.dto.EmpleadoDtos.EmpleadoResponse;
 import com.dsw02.empleados.controller.dto.EmpleadoDtos.EmpleadoUpdateRequest;
 import com.dsw02.empleados.service.EmpleadoService;
 
 import io.swagger.v3.oas.annotations.Operation;
-import io.swagger.v3.oas.annotations.media.ArraySchema;
 import io.swagger.v3.oas.annotations.media.Content;
 import io.swagger.v3.oas.annotations.media.Schema;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
@@ -49,11 +49,14 @@ public class EmpleadoController {
     }
 
     @Operation(summary = "Listar empleados")
-    @ApiResponse(responseCode = "200", description = "Lista de empleados", content = @Content(array = @ArraySchema(schema = @Schema(implementation = EmpleadoResponse.class))))
+    @ApiResponse(responseCode = "200", description = "Lista paginada de empleados", content = @Content(schema = @Schema(implementation = EmpleadoPageResponse.class)))
     @PreAuthorize("hasAnyRole('ADMIN','USER')")
     @GetMapping
-    public List<EmpleadoResponse> findAll() {
-        return service.findAll();
+    public EmpleadoPageResponse findAll(
+        @RequestParam(required = false) Integer page,
+        @RequestParam(required = false) Integer size
+    ) {
+        return service.findAll(page, size);
     }
 
     @Operation(summary = "Consultar empleado por clave compuesta")

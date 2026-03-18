@@ -4,7 +4,9 @@ import java.util.List;
 import java.util.regex.Pattern;
 
 import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -55,7 +57,12 @@ public class DepartamentoServiceImpl implements DepartamentoService {
     @Override
     @Transactional(readOnly = true)
     public DepartamentoPageResponse findAll(Integer page, Integer size) {
-        Pageable pageable = PaginationDefaults.normalize(page, size);
+        Pageable normalized = PaginationDefaults.normalize(page, size);
+        Pageable pageable = PageRequest.of(
+            normalized.getPageNumber(),
+            normalized.getPageSize(),
+            Sort.by(Sort.Direction.ASC, "id")
+        );
         Page<Departamento> result = departamentoRepository.findAll(pageable);
         List<DepartamentoResponse> content = result.getContent().stream().map(this::toResponse).toList();
         return new DepartamentoPageResponse(
@@ -110,7 +117,12 @@ public class DepartamentoServiceImpl implements DepartamentoService {
             throw new DepartamentoNotFoundException(id);
         }
 
-        Pageable pageable = PaginationDefaults.normalize(page, size);
+        Pageable normalized = PaginationDefaults.normalize(page, size);
+        Pageable pageable = PageRequest.of(
+            normalized.getPageNumber(),
+            normalized.getPageSize(),
+            Sort.by(Sort.Direction.ASC, "id.consecutivo")
+        );
         Page<Empleado> result = empleadoRepository.findByDepartamento_Id(id, pageable);
         List<EmpleadoResponse> content = result.getContent().stream()
             .map(empleado -> new EmpleadoResponse(

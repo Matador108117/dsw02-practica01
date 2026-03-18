@@ -4,11 +4,16 @@ import java.util.List;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import com.dsw02.empleados.controller.dto.EmpleadoDtos.EmpleadoCreateRequest;
+import com.dsw02.empleados.controller.dto.EmpleadoDtos.EmpleadoPageResponse;
 import com.dsw02.empleados.controller.dto.EmpleadoDtos.EmpleadoResponse;
 import com.dsw02.empleados.controller.dto.EmpleadoDtos.EmpleadoUpdateRequest;
 import com.dsw02.empleados.model.ClaveEmpleadoId;
@@ -77,8 +82,22 @@ public class EmpleadoServiceImpl implements EmpleadoService {
 
     @Override
     @Transactional(readOnly = true)
-    public List<EmpleadoResponse> findAll() {
-        return repository.findAll().stream().map(this::toResponse).toList();
+    public EmpleadoPageResponse findAll(Integer page, Integer size) {
+        Pageable normalized = PaginationDefaults.normalize(page, size);
+        Pageable pageable = PageRequest.of(
+            normalized.getPageNumber(),
+            normalized.getPageSize(),
+            Sort.by(Sort.Direction.ASC, "id.consecutivo")
+        );
+        Page<Empleado> result = repository.findAll(pageable);
+        List<EmpleadoResponse> content = result.getContent().stream().map(this::toResponse).toList();
+        return new EmpleadoPageResponse(
+            content,
+            result.getNumber(),
+            result.getSize(),
+            result.getTotalElements(),
+            result.getTotalPages()
+        );
     }
 
     @Override
