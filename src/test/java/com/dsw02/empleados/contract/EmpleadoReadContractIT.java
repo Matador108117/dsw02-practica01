@@ -34,7 +34,7 @@ class EmpleadoReadContractIT extends BasePostgresIT {
             "telefono", "5511111111"
         ));
 
-        MvcResult created = mockMvc.perform(post("/api/empleados")
+        MvcResult created = mockMvc.perform(post("/api/v2/empleados")
                 .with(httpBasic("admin", "admin123"))
                 .contentType(MediaType.APPLICATION_JSON)
                 .content(payload))
@@ -43,10 +43,10 @@ class EmpleadoReadContractIT extends BasePostgresIT {
 
         String clave = objectMapper.readTree(created.getResponse().getContentAsString()).get("clave").asText();
 
-        mockMvc.perform(get("/api/empleados").with(httpBasic("admin", "admin123")))
+        mockMvc.perform(get("/api/v2/empleados").with(httpBasic("admin", "admin123")))
             .andExpect(status().isOk());
 
-        mockMvc.perform(get("/api/empleados/{clave}", clave).with(httpBasic("admin", "admin123")))
+        mockMvc.perform(get("/api/v2/empleados/{clave}", clave).with(httpBasic("admin", "admin123")))
             .andExpect(status().isOk());
     }
 }

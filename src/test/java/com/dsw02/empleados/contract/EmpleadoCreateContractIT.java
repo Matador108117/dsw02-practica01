@@ -33,7 +33,7 @@ class EmpleadoCreateContractIT extends BasePostgresIT {
             "telefono", "5512345678"
         ));
 
-        mockMvc.perform(post("/api/empleados")
+        mockMvc.perform(post("/api/v2/empleados")
                 .with(httpBasic("admin", "admin123"))
                 .contentType(MediaType.APPLICATION_JSON)
                 .content(payload))
@@ -50,7 +50,7 @@ class EmpleadoCreateContractIT extends BasePostgresIT {
             "clave", "EMP-999999"
         ));
 
-        mockMvc.perform(post("/api/empleados")
+        mockMvc.perform(post("/api/v2/empleados")
                 .with(httpBasic("admin", "admin123"))
                 .contentType(MediaType.APPLICATION_JSON)
                 .content(payload))

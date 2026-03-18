@@ -24,7 +24,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 @RestController
-@RequestMapping("/api/empleados")
+@RequestMapping("/api/v2/empleados")
 @SecurityRequirement(name = "basicAuth")
 public class EmpleadoController {
 
@@ -40,7 +40,7 @@ public class EmpleadoController {
     @PostMapping
     public ResponseEntity<EmpleadoResponse> create(@Valid @RequestBody EmpleadoCreateRequest request) {
         EmpleadoResponse response = service.create(request);
-        return ResponseEntity.created(URI.create("/api/empleados/" + response.clave())).body(response);
+        return ResponseEntity.created(URI.create("/api/v2/empleados/" + response.clave())).body(response);
     }
 
     @Operation(summary = "Listar empleados")

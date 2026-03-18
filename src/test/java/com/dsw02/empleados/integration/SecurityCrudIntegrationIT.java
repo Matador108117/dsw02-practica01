@@ -19,13 +19,13 @@ class SecurityCrudIntegrationIT extends BasePostgresIT {
 
     @Test
     void shouldReturnUnauthorizedWithoutCredentials() throws Exception {
-        mockMvc.perform(get("/api/empleados"))
+        mockMvc.perform(get("/api/v2/empleados"))
             .andExpect(status().isUnauthorized());
     }
 
     @Test
     void shouldReturnOkWithValidCredentials() throws Exception {
-        mockMvc.perform(get("/api/empleados").with(httpBasic("admin", "admin123")))
+        mockMvc.perform(get("/api/v2/empleados").with(httpBasic("admin", "admin123")))
             .andExpect(status().isOk());
     }
 }

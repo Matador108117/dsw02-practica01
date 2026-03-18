@@ -27,7 +27,7 @@ class EmpleadoReadIntegrationIT extends BasePostgresIT {
 
     @Test
     void shouldReturn404ForMissingKey() throws Exception {
-        mockMvc.perform(get("/api/empleados/{clave}", "EMP-999999").with(httpBasic("admin", "admin123")))
+        mockMvc.perform(get("/api/v2/empleados/{clave}", "EMP-999999").with(httpBasic("admin", "admin123")))
             .andExpect(status().isNotFound());
     }
 
@@ -39,7 +39,7 @@ class EmpleadoReadIntegrationIT extends BasePostgresIT {
             "telefono", "5544444444"
         ));
 
-        MvcResult created = mockMvc.perform(post("/api/empleados")
+        MvcResult created = mockMvc.perform(post("/api/v2/empleados")
                 .with(httpBasic("admin", "admin123"))
                 .contentType(MediaType.APPLICATION_JSON)
                 .content(payload))
@@ -47,7 +47,7 @@ class EmpleadoReadIntegrationIT extends BasePostgresIT {
             .andReturn();
 
         String clave = objectMapper.readTree(created.getResponse().getContentAsString()).get("clave").asText();
-        mockMvc.perform(get("/api/empleados/{clave}", clave).with(httpBasic("admin", "admin123")))
+        mockMvc.perform(get("/api/v2/empleados/{clave}", clave).with(httpBasic("admin", "admin123")))
             .andExpect(status().isOk());
     }
 }
