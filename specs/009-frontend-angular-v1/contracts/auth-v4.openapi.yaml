@@ -1,0 +1,162 @@
+openapi: 3.0.3
+info:
+  title: Auth API v4 Contract
+  version: 1.0.0
+  description: >-
+    Authentication contract for frontend session bootstrap, refresh, and logout in API v4.
+servers:
+  - url: http://localhost:8080
+paths:
+  /api/v4/auth/login:
+    post:
+      summary: Authenticate user and issue access token
+      operationId: loginV4
+      tags: [Auth]
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/LoginRequest'
+      responses:
+        '200':
+          description: Successful authentication
+          headers:
+            Set-Cookie:
+              description: Sets secure auth cookies as applicable
+              schema:
+                type: string
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/LoginSuccessResponse'
+        '401':
+          description: Invalid credentials
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/AuthErrorResponse'
+
+  /api/v4/auth/refresh:
+    post:
+      summary: Refresh access token using refresh cookie
+      operationId: refreshV4
+      tags: [Auth]
+      parameters:
+        - in: header
+          name: X-CSRF-Token
+          required: true
+          schema:
+            type: string
+          description: Anti-CSRF token required for cookie-authenticated flows.
+      responses:
+        '200':
+          description: Token refreshed
+          headers:
+            Set-Cookie:
+              description: Updates access/refresh cookies when needed
+              schema:
+                type: string
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/RefreshSuccessResponse'
+        '401':
+          description: Refresh token invalid/expired
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/AuthErrorResponse'
+        '403':
+          description: CSRF validation failed
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/AuthErrorResponse'
+
+  /api/v4/auth/logout:
+    post:
+      summary: Revoke active session and clear auth cookies
+      operationId: logoutV4
+      tags: [Auth]
+      parameters:
+        - in: header
+          name: X-CSRF-Token
+          required: true
+          schema:
+            type: string
+          description: Anti-CSRF token required for cookie-authenticated flows.
+      responses:
+        '204':
+          description: Session revoked and cookies invalidated
+          headers:
+            Set-Cookie:
+              description: Clears auth cookies
+              schema:
+                type: string
+        '401':
+          description: Session missing or invalid
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/AuthErrorResponse'
+        '403':
+          description: CSRF validation failed
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/AuthErrorResponse'
+
+components:
+  schemas:
+    LoginRequest:
+      type: object
+      required: [email, password]
+      properties:
+        email:
+          type: string
+          format: email
+          example: admin@empresa.com
+        password:
+          type: string
+          minLength: 1
+          example: Admin123!
+
+    LoginSuccessResponse:
+      type: object
+      required: [token, role]
+      properties:
+        token:
+          type: string
+          description: JWT access token
+        role:
+          type: string
+          enum: [USER, ADMIN]
+
+    RefreshSuccessResponse:
+      type: object
+      required: [token, role, expiresIn]
+      properties:
+        token:
+          type: string
+        role:
+          type: string
+          enum: [USER, ADMIN]
+        expiresIn:
+          type: integer
+          format: int32
+          example: 3600
+
+    AuthErrorResponse:
+      type: object
+      required: [code, message, timestamp]
+      properties:
+        code:
+          type: string
+          example: AUTH_INVALID_CREDENTIALS
+        message:
+          type: string
+          example: Invalid email or password
+        timestamp:
+          type: string
+          format: date-time

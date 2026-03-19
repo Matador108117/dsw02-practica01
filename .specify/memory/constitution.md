@@ -1,11 +1,13 @@
 <!--
 Sync Impact Report
-- Version change: 3.1.0 -> 4.0.0
+- Version change: 4.1.0 -> 4.2.0
 - Modified principles:
-	- VI. API Versioning Compatibility -> VI. API Versioning Compatibility (clarified mandatory major bump for public contract changes)
-	- III. PostgreSQL + Docker by Default -> III. PostgreSQL + Docker by Default (expanded relational/FK obligations)
+	- II. Email/Password Authentication and Role Authorization -> II. Email/Password Authentication and Role Authorization (expanded with Basic+JWT coexistence policy)
+	- III. PostgreSQL + Docker by Default -> III. PostgreSQL + Docker by Default (expanded to require frontend Docker and compose integration)
+	- V. Testability and Operability Gates -> V. Testability and Operability Gates (expanded with mandatory frontend E2E gates)
+	- VI. API Versioning Compatibility -> VI. API Versioning Compatibility (expanded with independent frontend version policy)
 - Added sections:
-	- X. Domain Relational Integrity (Departamento-Empleado)
+	- XI. Official Frontend Platform
 - Removed sections:
 	- None
 - Templates requiring updates:
@@ -45,6 +47,15 @@ payloads.
 Access matrix for employee API endpoints MUST be explicit and testable:
 - `ADMIN`: create, read, update, delete.
 - `USER`: read only.
+
+Coexistence policy for authentication mechanisms is mandatory when frontend auth
+bootstrap is required:
+- HTTP Basic remains mandatory for protected domain endpoints unless explicitly
+	overridden by approved feature governance.
+- JWT-based authentication MAY be introduced only for explicitly documented auth
+	endpoints and MUST NOT weaken role authorization policies.
+- JWT flows MUST define token expiry, refresh behavior, revocation path, secure
+	storage constraints, and CSRF controls when cookies are used.
 Rationale: explicit identity and role boundaries are mandatory for secure API behavior.
 
 ### III. PostgreSQL + Docker by Default
@@ -55,6 +66,8 @@ environments. The `empleado` table schema MUST enforce non-null
 `contrasena` plaintext MUST NOT be stored in any persistent database column.
 Schema relations MUST be explicit using declared foreign keys when an entity
 references another persisted entity.
+Any official frontend delivery in this project MUST be containerized with Docker
+and integrated into the existing Docker Compose stack.
 Rationale: consistent runtime parity avoids environment-specific defects and
 guarantees security-critical identity data integrity.
 
@@ -67,8 +80,11 @@ Rationale: accurate API contracts reduce onboarding and integration friction.
 Changes MUST include automated tests proportional to risk, with mandatory integration
 coverage for authentication, role-based authorization, database access, and API
 contracts. Services MUST emit structured logs for critical flows and startup/runtime
-failures. Rationale: reliability depends on fast feedback and diagnosable production
-behavior.
+failures.
+Official frontend changes MUST include mandatory Cypress E2E execution with at least
+these scenarios: successful login, failed login, employee rendering, department
+rendering, and CRUD operations. No build is valid unless required E2E tests pass.
+Rationale: reliability depends on fast feedback and diagnosable production behavior.
 
 ### VI. API Versioning Compatibility
 Public HTTP endpoints MUST be versioned in the URI path using the `/api/v{major}`
@@ -85,6 +101,11 @@ for governance and MUST trigger a major API version increment.
 
 Current official public major for the domain model that includes `Departamento` is
 `v3`.
+
+Official public major for auth bootstrap endpoints using JWT coexistence is `v4`.
+
+When an official frontend is present, frontend release versioning MUST remain
+independent from backend API versioning.
 
 ### VII. API Pagination by Default
 All collection/list endpoints MUST implement pagination with explicit request parameters
@@ -133,14 +154,39 @@ Contract evolution rules are mandatory:
 Rationale: explicit relational integrity prevents orphaned references and keeps API
 and persistence behavior deterministic under schema evolution.
 
+### XI. Official Frontend Platform
+The project formally includes an official frontend as part of the delivery
+ecosystem. This frontend MUST use Angular 22 LTS, TypeScript, and nvm for Node
+version management.
+
+Integration rules are mandatory:
+- The frontend SHALL consume only official API endpoints.
+- Frontend business logic duplication of backend domain rules is forbidden.
+- Authentication SHALL be delegated to the API.
+- The frontend MUST integrate with the existing Docker Compose topology.
+
+Testing and release rules are mandatory:
+- Cypress is the required E2E framework.
+- E2E coverage MUST include successful login, failed login, employee rendering,
+	department rendering, and CRUD operations.
+- Builds MUST fail when required E2E tests fail or are skipped.
+- Frontend versioning SHALL be independent from backend and SHOULD follow the
+	pattern `vMAJOR.MINOR.PATCH-front` (for example `v1.0.0-front`).
+
+Rationale: a single governed frontend platform ensures consistent client behavior,
+prevents logic drift, and enforces deployment parity across environments.
+
 ## Technical Constraints
 
 - Runtime MUST be Java 17.
 - Framework MUST be Spring Boot 3.
 - Persistence MUST be PostgreSQL.
 - Local/CI database runtime MUST be Docker-managed.
+- Official frontend runtime MUST be Docker-managed and wired into existing compose.
 - API documentation MUST be available via Swagger UI.
 - Security for protected routes MUST use HTTP Basic (`type=http`, `scheme=basic`).
+- JWT MAY be used for explicit auth endpoints when approved by feature governance,
+  with mandatory expiry, refresh, revocation, and CSRF protections.
 - Basic Auth username MUST map to `correo_electronico` persisted in `empleado`.
 - Basic Auth password MUST be transient input and MUST be validated by comparing
   derived hash against persisted `contrasena_hash`.
@@ -160,6 +206,15 @@ and persistence behavior deterministic under schema evolution.
 - `empleado` to `departamento` association MUST be nullable at creation/update but
 	MUST be referentially valid when present.
 - Implicit inter-entity joins without declared FK are forbidden.
+- Official frontend stack MUST be Angular 22 LTS + TypeScript.
+- Node version management for frontend MUST use nvm.
+- Frontend MUST consume only official API endpoints and delegate authentication
+	to API flows.
+- Frontend MUST NOT duplicate backend business rules.
+- Frontend E2E testing MUST use Cypress and cover login success, login failure,
+	employee rendering, department rendering, and CRUD operations.
+- A build is invalid if mandatory Cypress E2E tests do not pass.
+- Frontend release versioning MUST remain independent from backend versioning.
 - Development workflow MUST use feature branches and PR-based integration.
 
 ## Delivery Workflow and Quality Gates
@@ -176,7 +231,14 @@ and persistence behavior deterministic under schema evolution.
 - Pull requests that modify authentication MUST show Basic Auth evidence for all
 	affected methods, including `username=correo_electronico` mapping and
 	hash-comparison validation path.
+- Pull requests that introduce JWT coexistence MUST provide evidence for token
+  lifecycle controls (expiry, refresh, revocation), secure cookie policy,
+  CSRF protections, and endpoint exposure classification.
 - Pull requests MUST document API version and pagination impacts when endpoints change.
+- Pull requests that include frontend changes MUST document Angular 22 LTS,
+	TypeScript, nvm, Docker image/container updates, and Docker Compose integration.
+- Pull requests that include frontend changes MUST include Cypress E2E evidence for:
+	login success, login failure, employee rendering, department rendering, and CRUD.
 - Pull requests that modify versioning MUST include evidence of sunset enforcement
 	(`410 Gone`) and UTC-based cutoff behavior.
 - Pull requests that introduce or modify `Departamento` domain behavior MUST include
@@ -200,6 +262,10 @@ Versioning policy:
 - MINOR: new principle/section or materially expanded mandatory guidance.
 - PATCH: wording clarifications and non-semantic refinements.
 
+Platform versioning policy:
+- Backend API and official frontend versions are independently governed.
+- Frontend SHOULD use the `vMAJOR.MINOR.PATCH-front` release tag format.
+
 Agent Compliance:
 - Automated implementation agents MUST adhere to Principle IX (Automated Agent Workflow
   Discipline) when executing feature implementations tied to spec identifiers.
@@ -211,10 +277,10 @@ Agent Compliance:
 Compliance review policy:
 - Every feature plan MUST pass a constitution gate before implementation starts.
 
-- Every pull request MUST confirm compliance with all ten principles, including the
+- Every pull request MUST confirm compliance with all eleven principles, including the
 	role policy (`USER` read-only, `ADMIN` CRUD), HTTP Basic auth semantics,
 	secure password-hash persistence, required employee identity fields, and
 	`Departamento` relational integrity rules.
 - Violations MUST be tracked with rationale and remediation tasks before approval.
 
-**Version**: 4.0.0 | **Ratified**: 2026-02-25 | **Last Amended**: 2026-03-17
+**Version**: 4.2.0 | **Ratified**: 2026-02-25 | **Last Amended**: 2026-03-19

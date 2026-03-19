@@ -123,6 +123,23 @@
   and employee department assignment MAY be null.
 - **BC-015**: Implicit relationships without declared FK constraints are forbidden.
 
+### Frontend Constraints *(mandatory when official frontend is in scope)*
+
+- **FC-001**: Official frontend implementation MUST use Angular 22 LTS.
+- **FC-002**: Frontend codebase MUST use TypeScript.
+- **FC-003**: Node version management MUST use nvm.
+- **FC-004**: Frontend MUST consume only official API endpoints.
+- **FC-005**: Frontend MUST NOT duplicate backend business logic.
+- **FC-006**: Frontend authentication flow MUST be delegated to the API.
+- **FC-007**: Frontend delivery MUST include Docker containerization.
+- **FC-008**: Frontend services MUST integrate with the existing docker-compose stack.
+- **FC-009**: Cypress MUST be the E2E framework for frontend testing.
+- **FC-010**: E2E coverage MUST include successful login, failed login,
+  employee rendering, department rendering, and CRUD operations.
+- **FC-011**: Builds are invalid when mandatory Cypress E2E tests fail or are skipped.
+- **FC-012**: Frontend versioning MUST be independent from backend;
+  recommended format is `vMAJOR.MINOR.PATCH-front`.
+
 *Example of marking unclear requirements:*
 
 - **FR-006**: System MUST authenticate users via [NEEDS CLARIFICATION: auth method not specified - email/password, SSO, OAuth?]
