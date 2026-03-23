@@ -3,6 +3,8 @@ package com.dsw02.empleados.controller;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.http.converter.HttpMessageNotReadableException;
+import org.springframework.security.authentication.BadCredentialsException;
+import org.springframework.security.access.AccessDeniedException;
 import org.springframework.validation.FieldError;
 import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
@@ -49,5 +51,17 @@ public class GlobalExceptionHandler {
     @ExceptionHandler(InvalidDepartamentoReferenceException.class)
     public ResponseEntity<ErrorResponse> handleUnprocessable(InvalidDepartamentoReferenceException exception) {
         return ResponseEntity.unprocessableEntity().body(new ErrorResponse("UNPROCESSABLE_ENTITY", exception.getMessage()));
+    }
+
+    @ExceptionHandler(BadCredentialsException.class)
+    public ResponseEntity<ErrorResponse> handleBadCredentials(BadCredentialsException exception) {
+        return ResponseEntity.status(HttpStatus.UNAUTHORIZED)
+            .body(new ErrorResponse("AUTH_INVALID_CREDENTIALS", exception.getMessage()));
+    }
+
+    @ExceptionHandler(AccessDeniedException.class)
+    public ResponseEntity<ErrorResponse> handleAccessDenied(AccessDeniedException exception) {
+        return ResponseEntity.status(HttpStatus.FORBIDDEN)
+            .body(new ErrorResponse("AUTH_FORBIDDEN", exception.getMessage()));
     }
 }

@@ -1,0 +1,15 @@
+{
+  "version": 1,
+  "skills": {
+    "cypress": {
+      "source": "bobmatnyc/claude-mpm-skills",
+      "sourceType": "github",
+      "computedHash": "2d086f605ccd314a4e878c74c4b77a06879a9a180bcf6b983ca5baa187e77463"
+    },
+    "frontend-design": {
+      "source": "anthropics/skills",
+      "sourceType": "github",
+      "computedHash": "063a0e6448123cd359ad0044cc46b0e490cc7964d45ef4bb9fd842bd2ffbca67"
+    }
+  }
+}

@@ -124,21 +124,22 @@ components:
 
     LoginSuccessResponse:
       type: object
-      required: [token, role]
+      required: [status, role]
       properties:
-        token:
+        status:
           type: string
-          description: JWT access token
+          enum: [ACCEPTED]
         role:
           type: string
           enum: [USER, ADMIN]
 
     RefreshSuccessResponse:
       type: object
-      required: [token, role, expiresIn]
+      required: [status, role, expiresIn]
       properties:
-        token:
+        status:
           type: string
+          enum: [ACCEPTED]
         role:
           type: string
           enum: [USER, ADMIN]

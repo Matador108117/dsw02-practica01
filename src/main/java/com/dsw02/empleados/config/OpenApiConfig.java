@@ -17,11 +17,10 @@ public class OpenApiConfig {
         final String securitySchemeName = "basicAuth";
         return new OpenAPI()
             .info(new Info()
-                .title("API CRUD de Empleados y Departamentos v3")
-                .version("3.0.0")
-                .description("API unificada en v3 con HTTP Basic Auth (correo_electronico:contrasena), \n" +
-                    "autorizacion por rol (ADMIN=CRUD, USER=Read-only), bloqueo por intentos fallidos, \n" +
-                    "y soporte de empleados/departamentos bajo /api/v3."))
+                .title("API de Empleados, Departamentos y Auth")
+                .version("4.0.0")
+                .description("API de dominio en /api/v3 con HTTP Basic Auth y endpoints de autenticacion\n" +
+                    "cookie-first en /api/v4/auth para login, refresh y logout con controles CSRF."))
             .addSecurityItem(new SecurityRequirement().addList(securitySchemeName))
             .components(new Components()
                 .addSecuritySchemes(securitySchemeName, new SecurityScheme()

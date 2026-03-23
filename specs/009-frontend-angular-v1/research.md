@@ -22,7 +22,7 @@
   - CORS-only dependence: rejected because CORS does not replace CSRF controls.
 
 ## Decision 4: HTTP semantics for login endpoint
-- Decision: `POST /api/v4/auth/login` returns `200 OK` with `{ token, role }` on success, `401 Unauthorized` with structured error on failure.
+- Decision: `POST /api/v4/auth/login` returns `200 OK` with `{ status, role }` on success and delivers auth tokens only via secure cookies; `401 Unauthorized` returns structured error without token fields.
 - Rationale: Standard auth semantics simplify client handling, observability, and automated test assertions.
 - Alternatives considered:
   - Always `200` with status field: rejected due to ambiguous error handling.

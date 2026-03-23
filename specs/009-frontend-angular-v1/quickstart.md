@@ -32,7 +32,7 @@ curl -i -X POST http://localhost:8080/api/v4/auth/login \
 ```
 
 Expected:
-- `200 OK` with `{ token, role }` on valid credentials
+- `200 OK` with `{ status, role }` on valid credentials and auth tokens delivered via secure cookies
 - `401 Unauthorized` with structured error on invalid credentials
 
 ## 4. Validate protected navigation behavior
@@ -58,3 +58,22 @@ Mandatory scenarios:
 - Keep session active and force access token expiration in test environment.
 - Trigger refresh flow and verify new token issuance.
 - Execute logout and verify cookies invalidated + redirect to login.
+
+## 7. Governance evidence
+- Record in PR description the constitutional amendment evidence for Basic+JWT coexistence (Constitution v4.2.0, Principle II and Technical Constraints section).
+
+## 8. Integration-test evidence matrix
+
+| Scope | Evidence |
+|-------|----------|
+| Auth flows | `AuthV4ContractIT`, `AuthIntegrationIT` |
+| Basic username/hash semantics | `BasicAuthUsernameMappingIntegrationIT`, `BasicAuthHashValidationIntegrationIT` |
+| Role authorization | `SecurityCrudIntegrationIT` |
+| DB/Flyway | `FlywayDepartamentosMigrationIT` + Testcontainers logs |
+| API contracts | `AuthV4ContractIT`, `PaginationDefaultsContractIT` |
+
+## 9. Traceability checklist
+
+- Link each completed task ID to at least one commit hash.
+- Include test execution evidence in PR (Maven + Cypress outputs).
+- Include API contract diff when auth/domain contracts change.

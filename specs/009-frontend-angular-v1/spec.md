@@ -2,7 +2,7 @@
 
 **Feature Branch**: `009-frontend-angular-v1`  
 **Created**: 2026-03-19  
-**Status**: Draft  
+**Status**: Implemented  
 **Input**: User description: "Frontend oficial Angular 22 LTS con login obligatorio, dashboard CRUD empleados/departamentos, Docker Compose y Cypress E2E"
 
 ## Clarifications
@@ -149,7 +149,8 @@ ejecutando flujo CRUD basico desde tarjetas toggle y comprobando resultado en ta
   departamento usando `GET /api/v3/departamentos/{id}/empleados`.
 - **FR-017**: El footer MUST mostrar version de frontend centrada.
 - **FR-018**: El frontend MUST aplicar paleta y estilo visual minimalista con estados
-  hover/activo claramente diferenciados y transiciones ligeras.
+  hover/activo claramente diferenciados, contraste minimo WCAG AA (>= 4.5:1)
+  para texto principal y transiciones de interfaz entre 100 ms y 250 ms.
 - **FR-019**: El frontend MUST ser responsive y colapsar sidebar en pantallas moviles.
 - **FR-020**: El frontend MUST tener Dockerfile propio, build de produccion, puerto
   configurable e integracion como servicio adicional en docker-compose existente.
@@ -257,6 +258,9 @@ ejecutando flujo CRUD basico desde tarjetas toggle y comprobando resultado en ta
   token puede persistir hasta 12 horas para restaurar sesion de forma controlada.
 - Se asume que la introduccion de auth en v4 y la continuidad de endpoints de dominio
   en v3 queda aprobada para esta entrega.
+- Se define como entorno de prueba para SC de performance: stack docker-compose local
+  con servicios `api`, `postgres` y `frontend`, ejecutando en el mismo host con al
+  menos 2 vCPU y 4 GB RAM disponibles para la prueba.
 
 ### Key Entities *(include if feature involves data)*
 

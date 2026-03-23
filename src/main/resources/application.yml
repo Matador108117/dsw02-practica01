@@ -49,6 +49,12 @@ app:
   api-version:
     release-v2-utc: ${API_RELEASE_V2_UTC:2026-03-14T00:00:00Z}
     sunset-v1-utc: ${API_SUNSET_V1_UTC:2026-06-12T00:00:00Z}
+  auth:
+    jwt-secret: ${APP_AUTH_JWT_SECRET:0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef}
+    issuer: ${APP_AUTH_ISSUER:dsw02-empleados}
+    access-token-seconds: ${APP_AUTH_ACCESS_SECONDS:1800}
+    refresh-token-seconds: ${APP_AUTH_REFRESH_SECONDS:43200}
+    secure-cookies: ${APP_AUTH_SECURE_COOKIES:false}
 
 logging:
   level:

@@ -12,11 +12,11 @@
 ## Entity: LoginResponse
 - Purpose: Successful authentication response.
 - Fields:
-  - `token` (string, required, JWT access token)
+  - `status` (enum: `ACCEPTED`, required)
   - `role` (enum: `USER`, `ADMIN`, required)
 - Validation rules:
   - Response must include both fields on success.
-  - Token must be accepted only if signature/expiration checks pass server-side.
+  - Access/refresh tokens are delivered via secure cookies, not payload fields.
 
 ## Entity: AuthErrorResponse
 - Purpose: Structured error for failed login.
@@ -39,7 +39,7 @@
 ## Entity: RefreshResponse
 - Purpose: Return renewed access token metadata.
 - Fields:
-  - `token` (string, required)
+  - `status` (enum: `ACCEPTED`, required)
   - `role` (enum: `USER`, `ADMIN`, required)
   - `expiresIn` (integer seconds, required)
 

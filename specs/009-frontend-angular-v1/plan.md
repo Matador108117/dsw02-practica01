@@ -16,7 +16,7 @@ logout y operaciones CRUD.
 
 ## Technical Context
 
-**Language/Version**: Java 17  
+**Language/Version**: Java 17 + TypeScript (Angular 22 LTS)  
 **Primary Dependencies**: Spring Boot 3, Spring Security, Spring Data JPA, springdoc-openapi, Angular 22 LTS, Cypress  
 **Storage**: PostgreSQL (Docker-managed in local and CI)  
 **Testing**: JUnit 5, Spring Boot Test, MockMvc/Testcontainers, Cypress E2E  

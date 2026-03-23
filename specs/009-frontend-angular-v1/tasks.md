@@ -10,12 +10,12 @@
 
 **Purpose**: Bootstrap frontend project scaffolding and runtime wiring.
 
-- [ ] T001 Create Angular 22 workspace skeleton in frontend/angular.json and frontend/package.json
-- [ ] T002 Configure Node version management in frontend/.nvmrc
-- [ ] T003 [P] Configure TypeScript strict mode and path aliases in frontend/tsconfig.json
-- [ ] T004 [P] Create production container build for frontend in frontend/Dockerfile
-- [ ] T005 [P] Add static server configuration for SPA routes in frontend/nginx.conf
-- [ ] T006 Integrate frontend service into compose stack in docker/docker-compose.yml
+- [X] T001 Create Angular 22 workspace skeleton in frontend/angular.json and frontend/package.json
+- [X] T002 Configure Node version management in frontend/.nvmrc
+- [X] T003 [P] Configure TypeScript strict mode and path aliases in frontend/tsconfig.json
+- [X] T004 [P] Create production container build for frontend in frontend/Dockerfile
+- [X] T005 [P] Add static server configuration for SPA routes in frontend/nginx.conf
+- [X] T006 Integrate frontend service into compose stack in docker/docker-compose.yml
 
 ---
 
@@ -25,15 +25,15 @@
 
 **⚠️ CRITICAL**: No user story work begins until this phase is complete.
 
-- [ ] T007 Create refresh-session persistence model in src/main/java/com/dsw02/empleados/model/RefreshTokenSession.java
-- [ ] T008 [P] Create refresh-session repository in src/main/java/com/dsw02/empleados/repository/RefreshTokenSessionRepository.java
-- [ ] T009 Add refresh-session Flyway migration in src/main/resources/db/migration/V12__create_refresh_token_session_table.sql
-- [ ] T010 [P] Implement JWT utility service in src/main/java/com/dsw02/empleados/service/JwtService.java
-- [ ] T011 Implement auth application service in src/main/java/com/dsw02/empleados/service/AuthServiceImpl.java
-- [ ] T012 [P] Define auth request/response DTOs in src/main/java/com/dsw02/empleados/controller/dto/AuthDtos.java
-- [ ] T013 Update security config for Basic+JWT coexistence and auth route policy in src/main/java/com/dsw02/empleados/config/SecurityConfig.java
-- [ ] T014 Implement CSRF token issuance/validation for sensitive endpoints in src/main/java/com/dsw02/empleados/config/SecurityConfig.java
-- [ ] T015 Record governance evidence link for approved Basic+JWT coexistence amendment in specs/009-frontend-angular-v1/quickstart.md [Req: FR-025]
+- [X] T007 Create refresh-session persistence model in src/main/java/com/dsw02/empleados/model/RefreshTokenSession.java
+- [X] T008 [P] Create refresh-session repository in src/main/java/com/dsw02/empleados/repository/RefreshTokenSessionRepository.java
+- [X] T009 Add refresh-session Flyway migration in src/main/resources/db/migration/V12__create_refresh_token_session_table.sql
+- [X] T010 [P] Implement JWT utility service in src/main/java/com/dsw02/empleados/service/JwtService.java
+- [X] T011 Implement auth application service in src/main/java/com/dsw02/empleados/service/AuthServiceImpl.java
+- [X] T012 [P] Define auth request/response DTOs in src/main/java/com/dsw02/empleados/controller/dto/AuthDtos.java
+- [X] T013 Update security config for Basic+JWT coexistence and auth route policy in src/main/java/com/dsw02/empleados/config/SecurityConfig.java
+- [X] T014 Implement CSRF token issuance/validation for sensitive endpoints in src/main/java/com/dsw02/empleados/config/SecurityConfig.java
+- [X] T015 Record governance evidence link for approved Basic+JWT coexistence amendment in specs/009-frontend-angular-v1/quickstart.md [Req: FR-025]
 
 Note: Constitutional coexistence amendment is handled as separate governance change;
 this feature only records evidence linkage.
@@ -50,19 +50,19 @@ this feature only records evidence linkage.
 
 ### Tests for User Story 1
 
-- [ ] T016 [P] [US1] Add auth contract tests for `/api/v4/auth/login`, `/api/v4/auth/refresh`, and `/api/v4/auth/logout`, asserting login payload schema (`status`, `role`) and absence of `token`/`refreshToken` in body for both `200` and `401` responses, in src/test/java/com/dsw02/empleados/contract/AuthV4ContractIT.java [Req: FR-026]
-- [ ] T017 [P] [US1] Add integration tests for login/refresh/logout + cookie flags in src/test/java/com/dsw02/empleados/integration/AuthIntegrationIT.java
-- [ ] T018 [P] [US1] Add Cypress login success/failure and protected-route redirect tests in frontend/cypress/e2e/auth/login.cy.ts
-- [ ] T053 [P] [US1] Add Cypress session rehydration tests for browser reopen/restore and refresh-token expiry boundary in frontend/cypress/e2e/auth/session-rehydration.cy.ts [Req: FR-029]
+- [X] T016 [P] [US1] Add auth contract tests for `/api/v4/auth/login`, `/api/v4/auth/refresh`, and `/api/v4/auth/logout`, asserting login payload schema (`status`, `role`) and absence of `token`/`refreshToken` in body for both `200` and `401` responses, in src/test/java/com/dsw02/empleados/contract/AuthV4ContractIT.java [Req: FR-026]
+- [X] T017 [P] [US1] Add integration tests for login/refresh/logout + cookie flags in src/test/java/com/dsw02/empleados/integration/AuthIntegrationIT.java
+- [X] T018 [P] [US1] Add Cypress login success/failure and protected-route redirect tests in frontend/cypress/e2e/auth/login.cy.ts
+- [X] T053 [P] [US1] Add Cypress session rehydration tests for browser reopen/restore and refresh-token expiry boundary in frontend/cypress/e2e/auth/session-rehydration.cy.ts [Req: FR-029]
 
 ### Implementation for User Story 1
 
-- [ ] T019 [P] [US1] Implement auth REST controller in src/main/java/com/dsw02/empleados/controller/AuthController.java
-- [ ] T020 [US1] Implement login, refresh, and logout flow for `/api/v4/auth/*` in src/main/java/com/dsw02/empleados/service/AuthServiceImpl.java
-- [ ] T021 [US1] Implement secure auth cookie management in src/main/java/com/dsw02/empleados/service/AuthCookieService.java
-- [ ] T022 [P] [US1] Implement frontend auth API client in frontend/src/app/core/api/auth-api.service.ts
-- [ ] T023 [US1] Implement auth state store and route guard in frontend/src/app/core/auth/auth.store.ts and frontend/src/app/core/auth/auth.guard.ts
-- [ ] T024 [US1] Implement login page, required field validation, and redirect flow in frontend/src/app/features/auth/login-page.component.ts
+- [X] T019 [P] [US1] Implement auth REST controller in src/main/java/com/dsw02/empleados/controller/AuthController.java
+- [X] T020 [US1] Implement login, refresh, and logout flow for `/api/v4/auth/*` in src/main/java/com/dsw02/empleados/service/AuthServiceImpl.java
+- [X] T021 [US1] Implement secure auth cookie management in src/main/java/com/dsw02/empleados/service/AuthCookieService.java
+- [X] T022 [P] [US1] Implement frontend auth API client in frontend/src/app/core/api/auth-api.service.ts
+- [X] T023 [US1] Implement auth state store and route guard in frontend/src/app/core/auth/auth.store.ts and frontend/src/app/core/auth/auth.guard.ts
+- [X] T024 [US1] Implement login page, required field validation, and redirect flow in frontend/src/app/features/auth/login-page.component.ts
 
 **Checkpoint**: User can authenticate and navigate securely with session handling.
 
@@ -76,20 +76,20 @@ this feature only records evidence linkage.
 
 ### Tests for User Story 2
 
-- [ ] T025 [P] [US2] Add Cypress entity rendering tests for empleados and departamentos in frontend/cypress/e2e/dashboard/render-entities.cy.ts
-- [ ] T026 [P] [US2] Add component tests for sidebar search/selection in frontend/src/app/features/dashboard/sidebar/sidebar.component.spec.ts
-- [ ] T027 [P] [US2] Add integration test coverage for `/api/v3/departamentos/{id}/empleados` rendering contract in src/test/java/com/dsw02/empleados/integration/DepartamentoEmpleadosEndpointIT.java [Req: FR-016]
-- [ ] T028 [P] [US2] Add integration/contract tests for pagination defaults and max limits on consumed list endpoints in src/test/java/com/dsw02/empleados/contract/PaginationDefaultsContractIT.java [Req: BC-009]
-- [ ] T059 [P] [US2] Add Cypress responsive assertions for 375x667 and 1366x768, validating sidebar navigation flow, logout visibility, and `body.scrollWidth == viewportWidth` in frontend/cypress/e2e/dashboard/responsive-layout.cy.ts [Req: SC-004]
+- [X] T025 [P] [US2] Add Cypress entity rendering tests for empleados and departamentos in frontend/cypress/e2e/dashboard/render-entities.cy.ts
+- [X] T026 [P] [US2] Add component tests for sidebar search/selection in frontend/src/app/features/dashboard/sidebar/sidebar.component.spec.ts
+- [X] T027 [P] [US2] Add integration test coverage for `/api/v3/departamentos/{id}/empleados` rendering contract in src/test/java/com/dsw02/empleados/integration/DepartamentoEmpleadosEndpointIT.java [Req: FR-016]
+- [X] T028 [P] [US2] Add integration/contract tests for pagination defaults and max limits on consumed list endpoints in src/test/java/com/dsw02/empleados/contract/PaginationDefaultsContractIT.java [Req: BC-009]
+- [X] T059 [P] [US2] Add Cypress responsive assertions for 375x667 and 1366x768, validating sidebar navigation flow, logout visibility, and `body.scrollWidth == viewportWidth` in frontend/cypress/e2e/dashboard/responsive-layout.cy.ts [Req: SC-004]
 
 ### Implementation for User Story 2
 
-- [ ] T029 [P] [US2] Build dashboard shell grid layout in frontend/src/app/features/dashboard/dashboard-shell.component.ts and frontend/src/app/features/dashboard/dashboard-shell.component.scss
-- [ ] T030 [US2] Implement header, subtitle, and footer version components in frontend/src/app/features/dashboard/header/header.component.ts and frontend/src/app/features/dashboard/footer/footer.component.ts
-- [ ] T031 [US2] Implement sidebar with API-driven entity list, search, and logout action in frontend/src/app/features/dashboard/sidebar/sidebar.component.ts
-- [ ] T032 [US2] Implement responsive entity table component in frontend/src/app/features/dashboard/entity-table/entity-table.component.ts
-- [ ] T033 [P] [US2] Implement empleados and departamentos API clients in frontend/src/app/core/api/empleados-api.service.ts and frontend/src/app/core/api/departamentos-api.service.ts
-- [ ] T034 [US2] Implement mobile sidebar collapse behavior in frontend/src/app/features/dashboard/dashboard-shell.component.scss
+- [X] T029 [P] [US2] Build dashboard shell grid layout in frontend/src/app/features/dashboard/dashboard-shell.component.ts and frontend/src/app/features/dashboard/dashboard-shell.component.scss
+- [X] T030 [US2] Implement header, subtitle, and footer version components in frontend/src/app/features/dashboard/header/header.component.ts and frontend/src/app/features/dashboard/footer/footer.component.ts
+- [X] T031 [US2] Implement sidebar with API-driven entity list, search, and logout action in frontend/src/app/features/dashboard/sidebar/sidebar.component.ts
+- [X] T032 [US2] Implement responsive entity table component in frontend/src/app/features/dashboard/entity-table/entity-table.component.ts
+- [X] T033 [P] [US2] Implement empleados and departamentos API clients in frontend/src/app/core/api/empleados-api.service.ts and frontend/src/app/core/api/departamentos-api.service.ts
+- [X] T034 [US2] Implement mobile sidebar collapse behavior in frontend/src/app/features/dashboard/dashboard-shell.component.scss
 
 **Checkpoint**: Dashboard UI is functional and independently testable for read flows.
 
@@ -103,18 +103,18 @@ this feature only records evidence linkage.
 
 ### Tests for User Story 3
 
-- [ ] T035 [P] [US3] Add Cypress CRUD toggle tests for empleados/departamentos in frontend/cypress/e2e/dashboard/crud-toggles.cy.ts
-- [ ] T036 [P] [US3] Add Cypress test for departamento empleados toggle using `/api/v3/departamentos/{id}/empleados` in frontend/cypress/e2e/dashboard/departamento-empleados.cy.ts
-- [ ] T037 [P] [US3] Add integration tests for CSRF enforcement on auth-sensitive CRUD requests in src/test/java/com/dsw02/empleados/integration/AuthCsrfCrudIT.java
+- [X] T035 [P] [US3] Add Cypress CRUD toggle tests for empleados/departamentos in frontend/cypress/e2e/dashboard/crud-toggles.cy.ts
+- [X] T036 [P] [US3] Add Cypress test for departamento empleados toggle using `/api/v3/departamentos/{id}/empleados` in frontend/cypress/e2e/dashboard/departamento-empleados.cy.ts
+- [X] T037 [P] [US3] Add integration tests for CSRF enforcement on auth-sensitive CRUD requests in src/test/java/com/dsw02/empleados/integration/AuthCsrfCrudIT.java
 
 ### Implementation for User Story 3
 
-- [ ] T038 [P] [US3] Create reusable toggle card base component in frontend/src/app/features/dashboard/actions/action-toggle-card.component.ts
-- [ ] T039 [US3] Implement add/edit/delete toggle card components in frontend/src/app/features/dashboard/actions/add-card.component.ts and frontend/src/app/features/dashboard/actions/edit-card.component.ts and frontend/src/app/features/dashboard/actions/delete-card.component.ts
-- [ ] T040 [US3] Implement departamento empleados toggle card in frontend/src/app/features/dashboard/actions/view-dept-empleados-card.component.ts
-- [ ] T041 [US3] Wire CRUD action orchestration and role-aware behavior in frontend/src/app/features/dashboard/dashboard.facade.ts
-- [ ] T042 [US3] Implement frontend CSRF interceptor for sensitive calls in frontend/src/app/core/http/csrf.interceptor.ts
-- [ ] T043 [US3] Extend backend auth/error mapping for auth and CSRF failures in src/main/java/com/dsw02/empleados/controller/GlobalExceptionHandler.java
+- [X] T038 [P] [US3] Create reusable toggle card base component in frontend/src/app/features/dashboard/actions/action-toggle-card.component.ts
+- [X] T039 [US3] Implement add/edit/delete toggle card components in frontend/src/app/features/dashboard/actions/add-card.component.ts and frontend/src/app/features/dashboard/actions/edit-card.component.ts and frontend/src/app/features/dashboard/actions/delete-card.component.ts
+- [X] T040 [US3] Implement departamento empleados toggle card in frontend/src/app/features/dashboard/actions/view-dept-empleados-card.component.ts
+- [X] T041 [US3] Wire CRUD action orchestration and role-aware behavior in frontend/src/app/features/dashboard/dashboard.facade.ts
+- [X] T042 [US3] Implement frontend CSRF interceptor for sensitive calls in frontend/src/app/core/http/csrf.interceptor.ts
+- [X] T043 [US3] Extend backend auth/error mapping for auth and CSRF failures in src/main/java/com/dsw02/empleados/controller/GlobalExceptionHandler.java
 
 **Checkpoint**: Full CRUD toggle behavior is independently testable.
 
@@ -124,23 +124,26 @@ this feature only records evidence linkage.
 
 **Purpose**: Complete release hardening, documentation, and full validation.
 
-- [ ] T044 [P] Update OpenAPI auth documentation and examples in src/main/java/com/dsw02/empleados/config/OpenApiConfig.java and specs/009-frontend-angular-v1/contracts/auth-v4.openapi.yaml [Req: FR-006, FR-026]
-- [ ] T045 [P] Add CI quality gates for Maven + Cypress in .github/workflows/ci.yml [Req: FR-022]
-- [ ] T046 [P] Finalize frontend compose/runtime health settings in docker/docker-compose.yml and frontend/Dockerfile [Req: FR-020]
-- [ ] T047 [P] Add integration-test evidence matrix for auth, role authorization, DB, and API contract suites in specs/009-frontend-angular-v1/quickstart.md and .github/workflows/ci.yml [Req: BC-007]
-- [ ] T048 Validate quickstart end-to-end steps and expected outputs in specs/009-frontend-angular-v1/quickstart.md [Req: FR-021]
-- [ ] T049 Document frontend release/versioning policy in docs/frontend-release.md [Req: FR-023, FC-012]
-- [ ] T050 [P] Add login performance benchmark and CI threshold gate (P95 <= 3s) in src/test/java/com/dsw02/empleados/performance/AuthLoginPerformanceIT.java and .github/workflows/ci.yml [Req: SC-002]
-- [ ] T051 [P] Add architecture rule and lint/test to prevent frontend business logic duplication in frontend/eslint.config.js and frontend/src/app/core/architecture/logic-boundary.spec.ts [Req: FC-005]
-- [ ] T052 Add implementation traceability checklist (tasks -> commits -> PR evidence) in specs/009-frontend-angular-v1/quickstart.md [Req: BC-010]
-- [ ] T054 [P] Add dashboard first-render performance benchmark and CI gate (P95 <= 2.5s) in frontend/cypress/e2e/perf/dashboard-render.cy.ts and .github/workflows/ci.yml [Req: SC-006]
-- [ ] T055 [P] Add auth refresh performance benchmark and CI gate (P95 <= 500ms) in src/test/java/com/dsw02/empleados/performance/AuthRefreshPerformanceIT.java and .github/workflows/ci.yml [Req: SC-007]
-- [ ] T056 [P] Add integration test coverage for required `correo_electronico` and `contrasena_hash` persistence constraints plus no-plaintext password persistence in src/test/java/com/dsw02/empleados/integration/EmpleadoPersistenceConstraintsIT.java [Req: BC-011, BC-012]
-- [ ] T057 [P] Add contract test for API sunset behavior returning `410 Gone` with UTC cutoff evaluation in src/test/java/com/dsw02/empleados/contract/ApiSunsetBehaviorContractIT.java [Req: BC-013]
-- [ ] T058 [P] Add relational integrity tests for Departamento->Empleado cardinality, nullable assignment, and explicit FK enforcement in src/test/java/com/dsw02/empleados/integration/DepartamentoEmpleadoIntegrityIT.java [Req: BC-014, BC-015]
-- [ ] T060 [P] Configure Cypress CI artifact publication (videos, screenshots, JUnit/JSON) for both passed and failed runs in .github/workflows/ci.yml [Req: FC-010]
-- [ ] T061 [P] Add CI enforcement step to fail pipeline when mandatory Cypress evidence artifacts are missing in .github/workflows/ci.yml [Req: FC-011]
-- [ ] T062 Add release verification gate for frontend footer version visibility and deployment artifact traceability in docs/frontend-release.md and .github/workflows/ci.yml [Req: SC-005]
+- [X] T044 [P] Update OpenAPI auth documentation and examples in src/main/java/com/dsw02/empleados/config/OpenApiConfig.java and specs/009-frontend-angular-v1/contracts/auth-v4.openapi.yaml [Req: FR-006, FR-026]
+- [X] T045 [P] Add CI quality gates for Maven + Cypress in .github/workflows/ci.yml [Req: FR-022]
+- [X] T046 [P] Finalize frontend compose/runtime health settings in docker/docker-compose.yml and frontend/Dockerfile [Req: FR-020]
+- [X] T047 [P] Add integration-test evidence matrix for auth, role authorization, DB, and API contract suites in specs/009-frontend-angular-v1/quickstart.md and .github/workflows/ci.yml [Req: BC-007]
+- [X] T048 Validate quickstart end-to-end steps and expected outputs in specs/009-frontend-angular-v1/quickstart.md [Req: FR-021]
+- [X] T049 Document frontend release/versioning policy in docs/frontend-release.md [Req: FR-023, FC-012]
+- [X] T050 [P] Add login performance benchmark and CI threshold gate (P95 <= 3s) in src/test/java/com/dsw02/empleados/performance/AuthLoginPerformanceIT.java and .github/workflows/ci.yml [Req: SC-002]
+- [X] T051 [P] Add architecture rule and lint/test to prevent frontend business logic duplication in frontend/eslint.config.js and frontend/src/app/core/architecture/logic-boundary.spec.ts [Req: FC-005]
+- [X] T052 Add implementation traceability checklist (tasks -> commits -> PR evidence) in specs/009-frontend-angular-v1/quickstart.md [Req: BC-010]
+- [X] T054 [P] Add dashboard first-render performance benchmark and CI gate (P95 <= 2.5s) in frontend/cypress/e2e/perf/dashboard-render.cy.ts and .github/workflows/ci.yml [Req: SC-006]
+- [X] T055 [P] Add auth refresh performance benchmark and CI gate (P95 <= 500ms) in src/test/java/com/dsw02/empleados/performance/AuthRefreshPerformanceIT.java and .github/workflows/ci.yml [Req: SC-007]
+- [X] T056 [P] Add integration test coverage for required `correo_electronico` and `contrasena_hash` persistence constraints plus no-plaintext password persistence in src/test/java/com/dsw02/empleados/integration/EmpleadoPersistenceConstraintsIT.java [Req: BC-011, BC-012]
+- [X] T057 [P] Add contract test for API sunset behavior returning `410 Gone` with UTC cutoff evaluation in src/test/java/com/dsw02/empleados/contract/ApiSunsetBehaviorContractIT.java [Req: BC-013]
+- [X] T058 [P] Add relational integrity tests for Departamento->Empleado cardinality, nullable assignment, and explicit FK enforcement in src/test/java/com/dsw02/empleados/integration/DepartamentoEmpleadoIntegrityIT.java [Req: BC-014, BC-015]
+- [X] T060 [P] Configure Cypress CI artifact publication (videos, screenshots, JUnit/JSON) for both passed and failed runs in .github/workflows/ci.yml [Req: FC-010]
+- [X] T061 [P] Add CI enforcement step to fail pipeline when mandatory Cypress evidence artifacts are missing in .github/workflows/ci.yml [Req: FC-011]
+- [X] T062 Add release verification gate for frontend footer version visibility and deployment artifact traceability in docs/frontend-release.md and .github/workflows/ci.yml [Req: SC-005]
+- [X] T063 [P] Validate USER read-only and ADMIN CRUD role matrix in existing integration suite src/test/java/com/dsw02/empleados/integration/SecurityCrudIntegrationIT.java and link evidence in specs/009-frontend-angular-v1/quickstart.md [Req: BC-003]
+- [X] T064 [P] Link explicit Basic-auth evidence for username=`correo_electronico` mapping and hash-comparison validation using existing suites src/test/java/com/dsw02/empleados/integration/BasicAuthUsernameMappingIntegrationIT.java and src/test/java/com/dsw02/empleados/integration/BasicAuthHashValidationIntegrationIT.java in specs/009-frontend-angular-v1/quickstart.md [Req: BC-002a, BC-002b]
+- [X] T065 [P] Add visual accessibility verification for contrast/transition policy in frontend/cypress/e2e/dashboard/visual-accessibility.cy.ts and include CI evidence linkage in .github/workflows/ci.yml [Req: FR-018]
 
 ---
 
@@ -168,7 +171,7 @@ this feature only records evidence linkage.
 - US1 tests `T016`-`T018` and `T053` can run in parallel.
 - US2 tests `T025`-`T028` and `T059` can run in parallel.
 - US3 tests `T035`-`T037` can run in parallel.
-- Polish tasks `T044`, `T045`, `T046`, `T047`, `T050`, `T051`, `T054`, `T055`, `T056`, `T057`, `T058`, `T060`, `T061` can run in parallel.
+- Polish tasks `T044`, `T045`, `T046`, `T047`, `T050`, `T051`, `T054`, `T055`, `T056`, `T057`, `T058`, `T060`, `T061`, `T063`, `T064`, `T065` can run in parallel.
 
 ---
 

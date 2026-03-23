@@ -9,17 +9,16 @@ import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.http.HttpMethod;
 import org.springframework.security.authentication.AuthenticationManager;
+import org.springframework.security.authentication.ProviderManager;
 import org.springframework.security.authentication.dao.DaoAuthenticationProvider;
-import org.springframework.security.config.Customizer;
-import org.springframework.security.config.annotation.authentication.configuration.AuthenticationConfiguration;
 import org.springframework.security.config.annotation.method.configuration.EnableMethodSecurity;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
-import org.springframework.security.config.annotation.web.configurers.AbstractHttpConfigurer;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.web.authentication.www.BasicAuthenticationFilter;
+import org.springframework.security.web.csrf.CookieCsrfTokenRepository;
 
 import com.dsw02.empleados.model.ClaveEmpleadoId;
 import com.dsw02.empleados.model.Empleado;
@@ -38,6 +37,7 @@ public class SecurityConfig {
     private final EmpleadoRepository empleadoRepository;
     private final ApiVersionSupportPolicyService versionPolicyService;
     private final ApiVersionSunsetFilter apiVersionSunsetFilter;
+    private final JwtCookieAuthenticationFilter jwtCookieAuthenticationFilter;
 
     @Value("${app.bootstrap-admin.email:admin@empresa.com}")
     private String bootstrapAdminEmail;
@@ -56,10 +56,12 @@ public class SecurityConfig {
 
     public SecurityConfig(EmpleadoRepository empleadoRepository,
                          ApiVersionSupportPolicyService versionPolicyService,
-                         ApiVersionSunsetFilter apiVersionSunsetFilter) {
+                         ApiVersionSunsetFilter apiVersionSunsetFilter,
+                         JwtCookieAuthenticationFilter jwtCookieAuthenticationFilter) {
         this.empleadoRepository = empleadoRepository;
         this.versionPolicyService = versionPolicyService;
         this.apiVersionSunsetFilter = apiVersionSunsetFilter;
+        this.jwtCookieAuthenticationFilter = jwtCookieAuthenticationFilter;
     }
 
     @Bean
@@ -70,11 +72,16 @@ public class SecurityConfig {
     @Bean
     public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
         http
-            .csrf(AbstractHttpConfigurer::disable)
+            .csrf(csrf -> csrf
+                .csrfTokenRepository(CookieCsrfTokenRepository.withHttpOnlyFalse())
+                .ignoringRequestMatchers("/api/v4/auth/login", "/api/v3/**")
+            )
             .authorizeHttpRequests(auth -> auth
                 .requestMatchers("/v3/api-docs/**", "/swagger-ui/**", "/swagger-ui.html", 
                     "/swagger-ui.css", "/swagger-ui-*.js", "/swagger-ui-*.css").permitAll()
                 .requestMatchers("/actuator/**").permitAll()
+                .requestMatchers(HttpMethod.POST, "/api/v4/auth/login", "/api/v4/auth/refresh").permitAll()
+                .requestMatchers(HttpMethod.POST, "/api/v4/auth/logout").authenticated()
                 .requestMatchers(HttpMethod.GET, "/api/v3/empleados/**", "/api/v3/departamentos/**")
                     .hasAnyRole("ADMIN", "USER")
                 .requestMatchers(HttpMethod.POST, "/api/v3/empleados/**", "/api/v3/departamentos/**")
@@ -85,8 +92,18 @@ public class SecurityConfig {
                     .hasRole("ADMIN")
                 .anyRequest().authenticated()
             )
+            .exceptionHandling(exception -> exception.authenticationEntryPoint((request, response, authException) -> {
+                response.setStatus(401);
+                response.setContentType("application/json");
+                response.getWriter().write("{\"code\":\"UNAUTHORIZED\",\"message\":\"Unauthorized\"}");
+            }))
+            .addFilterBefore(jwtCookieAuthenticationFilter, BasicAuthenticationFilter.class)
             .addFilterBefore(apiVersionSunsetFilter, BasicAuthenticationFilter.class)
-            .httpBasic(Customizer.withDefaults());
+            .httpBasic(httpBasic -> httpBasic.authenticationEntryPoint((request, response, authException) -> {
+                response.setStatus(401);
+                response.setContentType("application/json");
+                response.getWriter().write("{\"code\":\"UNAUTHORIZED\",\"message\":\"Unauthorized\"}");
+            }));
 
         return http.build();
     }
@@ -100,8 +117,8 @@ public class SecurityConfig {
     }
 
     @Bean
-    public AuthenticationManager authenticationManager(AuthenticationConfiguration authConfig) throws Exception {
-        return authConfig.getAuthenticationManager();
+    public AuthenticationManager authenticationManager(DaoAuthenticationProvider authenticationProvider) {
+        return new ProviderManager(authenticationProvider);
     }
 
     @Bean

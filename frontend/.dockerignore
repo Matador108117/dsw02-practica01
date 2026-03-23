@@ -1,0 +1,23 @@
+# Dependencies and build outputs
+node_modules/
+dist/
+coverage/
+.angular/
+.cache/
+
+# Tooling and test artifacts
+cypress/videos/
+cypress/screenshots/
+
+# VCS and local environment
+.git/
+.env*
+*.log
+
+# Editor/system files
+.vscode/
+.idea/
+.DS_Store
+Thumbs.db
+*.tmp
+*.swp
