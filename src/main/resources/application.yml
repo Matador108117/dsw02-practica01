@@ -36,6 +36,16 @@ springdoc:
   swagger-ui:
     path: /swagger-ui/index.html
 
+management:
+  endpoints:
+    web:
+      exposure:
+        include: health,info
+  endpoint:
+    health:
+      probes:
+        enabled: true
+
 app:
   bootstrap-admin:
     email: ${APP_BOOTSTRAP_ADMIN_EMAIL:admin@empresa.com}

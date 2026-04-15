@@ -2,6 +2,8 @@ FROM node:22-alpine AS build
 WORKDIR /app
 
 COPY package*.json ./
+# Cypress is a dev dependency used for tests; skip binary download in image builds.
+ENV CYPRESS_INSTALL_BINARY=0
 RUN npm ci
 
 COPY . .

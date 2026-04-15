@@ -1,9 +1,26 @@
 services:
-  api:
+  proxy:
+    image: nginx:1.27-alpine
+    container_name: empleados-proxy
+    ports:
+      - "80:80"
+    volumes:
+      - ./proxy.nginx.conf:/etc/nginx/conf.d/default.conf:ro
+    healthcheck:
+      test: ["CMD-SHELL", "wget -qO- http://127.0.0.1/actuator/health | grep -q '\"status\":\"UP\"' || exit 1"]
+      interval: 30s
+      timeout: 5s
+      retries: 3
+    depends_on:
+      backend:
+        condition: service_healthy
+      frontend:
+        condition: service_healthy
+
+  backend:
     build:
       context: ..
       dockerfile: Dockerfile
-    container_name: empleados-api
     environment:
       DB_URL: "jdbc:postgresql://postgres:5432/empleados_db"
       DB_USER: "empleados"
@@ -16,8 +33,14 @@ services:
       APP_TEST_USER_ROLE: "USER"
       API_RELEASE_V2_UTC: "2026-03-14T00:00:00Z"
       API_SUNSET_V1_UTC: "2026-06-12T00:00:00Z"
-    ports:
-      - "8080:8080"
+    expose:
+      - "8080"
+    healthcheck:
+      test: ["CMD-SHELL", "curl -fsS http://localhost:8080/actuator/health | grep -q '\"status\":\"UP\"' || exit 1"]
+      interval: 15s
+      timeout: 5s
+      retries: 10
+      start_period: 40s
     depends_on:
       postgres:
         condition: service_healthy
@@ -26,17 +49,16 @@ services:
     build:
       context: ../frontend
       dockerfile: Dockerfile
-    container_name: empleados-frontend
-    ports:
-      - "4200:80"
+    expose:
+      - "80"
     healthcheck:
       test: ["CMD-SHELL", "nginx -t || exit 1"]
       interval: 30s
       timeout: 5s
       retries: 3
     depends_on:
-      api:
-        condition: service_started
+      backend:
+        condition: service_healthy
 
   postgres:
     image: postgres:15
@@ -45,13 +67,13 @@ services:
       POSTGRES_DB: "empleados_db"
       POSTGRES_USER: "empleados"
       POSTGRES_PASSWORD: "empleados"
-    ports:
-      - "5433:5432"
     healthcheck:
       test: ["CMD-SHELL", "pg_isready -U empleados -d empleados_db"]
       interval: 10s
       timeout: 5s
       retries: 5
+    expose:
+      - "5432"
     volumes:
       - empleados_pgdata:/var/lib/postgresql/data
 
