@@ -56,4 +56,4 @@ jobs:
         run: npm ci
 
       - name: Run frontend tests
-        run: npm run test -- --browsers=ChromeHeadless
+        run: npm run test

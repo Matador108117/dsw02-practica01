@@ -31,6 +31,14 @@
             "buildTarget": "empleados-frontend:build",
             "proxyConfig": "proxy.conf.json"
           }
+        },
+        "test": {
+          "builder": "@angular/build:unit-test",
+          "options": {
+            "buildTarget": "empleados-frontend:build",
+            "tsConfig": "tsconfig.json",
+            "runner": "vitest"
+          }
         }
       }
     }
