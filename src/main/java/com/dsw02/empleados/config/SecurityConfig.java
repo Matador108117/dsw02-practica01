@@ -77,7 +77,7 @@ public class SecurityConfig {
         http
             .csrf(csrf -> csrf
                 .csrfTokenRepository(csrfTokenRepository)
-                .ignoringRequestMatchers("/api/v4/auth/login", "/api/v3/**")
+                .ignoringRequestMatchers("/api/v4/auth/login", "/api/v4/auth/refresh", "/api/v4/auth/logout", "/api/v3/**")
             )
             .authorizeHttpRequests(auth -> auth
                 .requestMatchers("/v3/api-docs/**", "/swagger-ui/**", "/swagger-ui.html", 
