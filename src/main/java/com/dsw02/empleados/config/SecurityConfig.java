@@ -83,8 +83,7 @@ public class SecurityConfig {
                 .requestMatchers("/v3/api-docs/**", "/swagger-ui/**", "/swagger-ui.html", 
                     "/swagger-ui.css", "/swagger-ui-*.js", "/swagger-ui-*.css").permitAll()
                 .requestMatchers("/actuator/**").permitAll()
-                .requestMatchers(HttpMethod.POST, "/api/v4/auth/login", "/api/v4/auth/refresh").permitAll()
-                .requestMatchers(HttpMethod.POST, "/api/v4/auth/logout").authenticated()
+                .requestMatchers(HttpMethod.POST, "/api/v4/auth/login", "/api/v4/auth/refresh", "/api/v4/auth/logout").permitAll()
                 .requestMatchers(HttpMethod.GET, "/api/v3/empleados/**", "/api/v3/departamentos/**")
                     .hasAnyRole("ADMIN", "USER")
                 .requestMatchers(HttpMethod.POST, "/api/v3/empleados/**", "/api/v3/departamentos/**")

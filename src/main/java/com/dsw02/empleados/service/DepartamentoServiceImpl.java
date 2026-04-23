@@ -24,7 +24,7 @@ import com.dsw02.empleados.repository.EmpleadoRepository;
 @Service
 public class DepartamentoServiceImpl implements DepartamentoService {
 
-    private static final Pattern ID_PATTERN = Pattern.compile("^DEP-[0-9]{6}$");
+    private static final Pattern ID_PATTERN = Pattern.compile("^DEP-[A-Za-z0-9]{1,6}$");
 
     private final DepartamentoRepository departamentoRepository;
     private final EmpleadoRepository empleadoRepository;
@@ -150,7 +150,7 @@ public class DepartamentoServiceImpl implements DepartamentoService {
 
     private void validateId(String id) {
         if (id == null || !ID_PATTERN.matcher(id).matches()) {
-            throw new IllegalArgumentException("Formato de id de departamento invalido. Se espera DEP- + 6 digitos.");
+            throw new IllegalArgumentException("Formato de id de departamento invalido. Se espera DEP- + 1 a 6 caracteres alfanumericos.");
         }
     }
 

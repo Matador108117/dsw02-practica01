@@ -76,8 +76,8 @@ public class ApiVersionSupportPolicyService {
             String activeVersion,
             OffsetDateTime releaseV2AtUtc,
             OffsetDateTime sunsetAtUtc) {
-
-        if (policyRepository.findByApiName(apiName).isEmpty()) {
+        Optional<ApiVersionSupportPolicy> existing = policyRepository.findByApiName(apiName);
+        if (existing.isEmpty()) {
             ApiVersionSupportPolicy policy = new ApiVersionSupportPolicy(
                 apiName,
                 deprecatedVersion,
@@ -87,6 +87,15 @@ public class ApiVersionSupportPolicyService {
             );
             policy.setDeprecationNotice("Version " + deprecatedVersion + " deprecated as of " + releaseV2AtUtc + ", will be removed on " + sunsetAtUtc);
             policyRepository.save(policy);
+            return;
         }
+
+        ApiVersionSupportPolicy policy = existing.get();
+        policy.setDeprecatedVersion(deprecatedVersion);
+        policy.setActiveVersion(activeVersion);
+        policy.setReleaseV2AtUtc(releaseV2AtUtc);
+        policy.setSunsetAtUtc(sunsetAtUtc);
+        policy.setDeprecationNotice("Version " + deprecatedVersion + " deprecated as of " + releaseV2AtUtc + ", will be removed on " + sunsetAtUtc);
+        policyRepository.save(policy);
     }
 }
