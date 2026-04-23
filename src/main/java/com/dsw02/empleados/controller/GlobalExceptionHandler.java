@@ -3,23 +3,32 @@ package com.dsw02.empleados.controller;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.http.converter.HttpMessageNotReadableException;
-import org.springframework.security.authentication.BadCredentialsException;
 import org.springframework.security.access.AccessDeniedException;
+import org.springframework.security.authentication.BadCredentialsException;
 import org.springframework.validation.FieldError;
 import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
+import org.springframework.web.servlet.resource.NoResourceFoundException;
 
 import com.dsw02.empleados.controller.dto.EmpleadoDtos.ErrorResponse;
+import com.dsw02.empleados.service.ApiVersionSupportPolicyService;
 import com.dsw02.empleados.service.DepartamentoConflictException;
 import com.dsw02.empleados.service.DepartamentoNotFoundException;
 import com.dsw02.empleados.service.EmpleadoNotFoundException;
 import com.dsw02.empleados.service.InvalidDepartamentoReferenceException;
 
+import jakarta.servlet.http.HttpServletRequest;
 import jakarta.validation.ConstraintViolationException;
 
 @RestControllerAdvice
 public class GlobalExceptionHandler {
+
+    private final ApiVersionSupportPolicyService apiVersionSupportPolicyService;
+
+    public GlobalExceptionHandler(ApiVersionSupportPolicyService apiVersionSupportPolicyService) {
+        this.apiVersionSupportPolicyService = apiVersionSupportPolicyService;
+    }
 
     @ExceptionHandler(MethodArgumentNotValidException.class)
     public ResponseEntity<ErrorResponse> handleValidation(MethodArgumentNotValidException exception) {
@@ -63,5 +72,16 @@ public class GlobalExceptionHandler {
     public ResponseEntity<ErrorResponse> handleAccessDenied(AccessDeniedException exception) {
         return ResponseEntity.status(HttpStatus.FORBIDDEN)
             .body(new ErrorResponse("AUTH_FORBIDDEN", exception.getMessage()));
+    }
+
+    @ExceptionHandler(NoResourceFoundException.class)
+    public ResponseEntity<ErrorResponse> handleNoResourceFound(NoResourceFoundException exception, HttpServletRequest request) {
+        String uri = request.getRequestURI();
+        if (uri != null && uri.startsWith("/api/v1/") && apiVersionSupportPolicyService.isVersionSunset("empleados")) {
+            return ResponseEntity.status(HttpStatus.GONE)
+                .body(new ErrorResponse("GONE", "API version v1 is sunset and no longer available"));
+        }
+        return ResponseEntity.status(HttpStatus.NOT_FOUND)
+            .body(new ErrorResponse("NOT_FOUND", exception.getMessage()));
     }
 }

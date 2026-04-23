@@ -4,6 +4,7 @@ import java.time.OffsetDateTime;
 import java.time.temporal.ChronoUnit;
 import java.util.Optional;
 
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -19,6 +20,9 @@ import com.dsw02.empleados.repository.ApiVersionSupportPolicyRepository;
 public class ApiVersionSupportPolicyService {
 
     private final ApiVersionSupportPolicyRepository policyRepository;
+
+    @Value("${app.api-version.sunset-v1-utc:2026-06-12T00:00:00Z}")
+    private String configuredSunsetV1Utc;
 
     public ApiVersionSupportPolicyService(ApiVersionSupportPolicyRepository policyRepository) {
         this.policyRepository = policyRepository;
@@ -42,8 +46,18 @@ public class ApiVersionSupportPolicyService {
      * @return true if version is sunsetted, false if still in deprecation window
      */
     public boolean isVersionSunset(String apiName) {
+        OffsetDateTime now = OffsetDateTime.now();
+
+        try {
+            if (!now.isBefore(OffsetDateTime.parse(configuredSunsetV1Utc))) {
+                return true;
+            }
+        } catch (Exception ignored) {
+            // If configured value is malformed, fallback to DB policy.
+        }
+
         return findByApiName(apiName)
-            .map(policy -> policy.isVersionSunset(OffsetDateTime.now()))
+            .map(policy -> policy.isVersionSunset(now))
             .orElse(false);
     }
 

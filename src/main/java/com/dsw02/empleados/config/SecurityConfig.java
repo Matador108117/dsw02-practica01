@@ -21,8 +21,10 @@ import org.springframework.security.web.authentication.www.BasicAuthenticationFi
 import org.springframework.security.web.csrf.CookieCsrfTokenRepository;
 
 import com.dsw02.empleados.model.ClaveEmpleadoId;
+import com.dsw02.empleados.model.Departamento;
 import com.dsw02.empleados.model.Empleado;
 import com.dsw02.empleados.model.Rol;
+import com.dsw02.empleados.repository.DepartamentoRepository;
 import com.dsw02.empleados.repository.EmpleadoRepository;
 import com.dsw02.empleados.service.ApiVersionSupportPolicyService;
 
@@ -35,6 +37,7 @@ public class SecurityConfig {
 
     private static final Logger log = LoggerFactory.getLogger(SecurityConfig.class);
     private final EmpleadoRepository empleadoRepository;
+    private final DepartamentoRepository departamentoRepository;
     private final ApiVersionSupportPolicyService versionPolicyService;
     private final ApiVersionSunsetFilter apiVersionSunsetFilter;
     private final JwtCookieAuthenticationFilter jwtCookieAuthenticationFilter;
@@ -55,10 +58,12 @@ public class SecurityConfig {
     private String sunsetV1UtcString;
 
     public SecurityConfig(EmpleadoRepository empleadoRepository,
+                         DepartamentoRepository departamentoRepository,
                          ApiVersionSupportPolicyService versionPolicyService,
                          ApiVersionSunsetFilter apiVersionSunsetFilter,
                          JwtCookieAuthenticationFilter jwtCookieAuthenticationFilter) {
         this.empleadoRepository = empleadoRepository;
+        this.departamentoRepository = departamentoRepository;
         this.versionPolicyService = versionPolicyService;
         this.apiVersionSunsetFilter = apiVersionSunsetFilter;
         this.jwtCookieAuthenticationFilter = jwtCookieAuthenticationFilter;
@@ -163,6 +168,14 @@ public class SecurityConfig {
                 "empleados", "v1", "v2", releaseV2, sunsetV1
             );
             log.info("API version policy initialized");
+
+            if (!departamentoRepository.existsById("DEP-1")) {
+                Departamento departamento = new Departamento();
+                departamento.setId("DEP-1");
+                departamento.setNombre("General");
+                departamentoRepository.save(departamento);
+                log.info("Legacy departamento DEP-1 seeded");
+            }
 
         } catch (Exception e) {
             log.error("Failed to bootstrap ADMIN user", e);
