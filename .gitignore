@@ -33,3 +33,6 @@ Thumbs.db
 
 # Docker local artifacts
 docker/.env
+media/
+__pycache__/
+.venv/
