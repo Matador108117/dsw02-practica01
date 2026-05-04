@@ -3,7 +3,7 @@ name: 03-docker
 on:
   pull_request:
     branches:
-      - main
+      - master
     types:
       - closed
 
