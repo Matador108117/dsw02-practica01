@@ -21,6 +21,7 @@ description: "Task list template for feature implementation"
 ## Path Conventions
 
 - **Spring backend**: `src/main/java/`, `src/main/resources/`, `src/test/java/`
+- **Official frontend**: `frontend/`, `frontend/src/`, `frontend/cypress/`
 - **Docker assets**: `docker/` or repository root `docker-compose.yml`
 - Paths shown below assume Spring Boot backend - adjust package names per plan.md
 
@@ -64,12 +65,31 @@ Examples of foundational tasks (adjust based on your project):
 
 - [ ] T005 Setup PostgreSQL schema and migrations framework
 - [ ] T006 [P] Configure Docker Compose for PostgreSQL local/CI runtime
-- [ ] T007 [P] Implement HTTP Basic Authentication with Spring Security
+- [ ] T007 [P] Implement mandatory HTTP Basic (`type=http`, `scheme=basic`) on
+  API methods with Spring Security, using `correo_electronico` as username and
+  role-based authorization (`USER` read-only, `ADMIN` CRUD)
+- [ ] T007a [P] Enforce required `correo_electronico` and `contrasena_hash`
+  attributes in `empleado` schema/entity validation and migration scripts;
+  treat `contrasena` as input-only (no plaintext persistence) and validate
+  authentication by hash comparison against `contrasena_hash`
 - [ ] T008 [P] Setup API routing and global exception handling
 - [ ] T009 [P] Establish API versioning baseline (`/api/v1`) and route conventions
-- [ ] T010 [P] Define reusable pagination request/response model and defaults
-- [ ] T011 Create base entities/repositories shared by user stories
-- [ ] T012 Configure structured logging and environment configuration
+- [ ] T009a [P] If public contract expands or new public endpoints are added,
+  create tasks to increment API major version and update migration notes/OpenAPI
+- [ ] T009b [P] Implement UTC-based sunset enforcement for deprecated versions
+  with `410 Gone` response behavior
+- [ ] T009c [P] For Department-domain scope, add schema/model tasks for explicit
+  FK-backed `Departamento (1) -> (N) Empleados` relation with nullable employee
+  department assignment
+- [ ] T010 [P] Scaffold official frontend with Angular 22 LTS + TypeScript,
+  enforce Node management via nvm
+- [ ] T011 [P] Containerize frontend and integrate service into existing
+  docker-compose stack
+- [ ] T012 [P] Define reusable pagination request/response model and defaults
+- [ ] T013 [P] Add Cypress E2E framework and configure CI build to fail when
+  required E2E suite does not pass
+- [ ] T014 Create base entities/repositories shared by user stories
+- [ ] T015 Configure structured logging and environment configuration
 
 **Checkpoint**: Foundation ready - user story implementation can now begin in parallel
 
@@ -85,17 +105,19 @@ Examples of foundational tasks (adjust based on your project):
 
 > **NOTE: Write these tests FIRST, ensure they FAIL before implementation**
 
-- [ ] T013 [P] [US1] Contract test for [endpoint] in src/test/java/contract/[Name]ContractTest.java
-- [ ] T014 [P] [US1] Integration test for [user journey] in src/test/java/integration/[Name]IT.java
+- [ ] T016 [P] [US1] Contract test for [endpoint] in src/test/java/contract/[Name]ContractTest.java
+- [ ] T017 [P] [US1] Integration test for [user journey] in src/test/java/integration/[Name]IT.java
+- [ ] T018 [P] [US1] Cypress E2E scenarios in frontend/cypress/e2e/
+  (login success/failure, employee rendering, department rendering, CRUD)
 
 ### Implementation for User Story 1
 
-- [ ] T015 [P] [US1] Create [Entity1] in src/main/java/.../model/[Entity1].java
-- [ ] T016 [P] [US1] Create [Entity2] in src/main/java/.../model/[Entity2].java
-- [ ] T017 [US1] Implement [Service] in src/main/java/.../service/[Service].java (depends on T015, T016)
-- [ ] T018 [US1] Implement [endpoint/feature] in src/main/java/.../controller/[Controller].java
-- [ ] T019 [US1] Add validation, error handling, auth rules, and pagination behavior
-- [ ] T020 [US1] Update OpenAPI annotations with versioned path and verify Swagger rendering
+- [ ] T019 [P] [US1] Create [Entity1] in src/main/java/.../model/[Entity1].java
+- [ ] T020 [P] [US1] Create [Entity2] in src/main/java/.../model/[Entity2].java
+- [ ] T021 [US1] Implement [Service] in src/main/java/.../service/[Service].java (depends on T019, T020)
+- [ ] T022 [US1] Implement [endpoint/feature] in src/main/java/.../controller/[Controller].java
+- [ ] T023 [US1] Add validation, error handling, role auth rules, and pagination behavior
+- [ ] T024 [US1] Update OpenAPI annotations with versioned path and verify Swagger rendering
 
 **Checkpoint**: At this point, User Story 1 should be fully functional and testable independently
 
@@ -109,15 +131,15 @@ Examples of foundational tasks (adjust based on your project):
 
 ### Tests for User Story 2 (OPTIONAL - only if tests requested) ⚠️
 
-- [ ] T021 [P] [US2] Contract test for [endpoint] in src/test/java/contract/[Name]ContractTest.java
-- [ ] T022 [P] [US2] Integration test for [user journey] in src/test/java/integration/[Name]IT.java
+- [ ] T025 [P] [US2] Contract test for [endpoint] in src/test/java/contract/[Name]ContractTest.java
+- [ ] T026 [P] [US2] Integration test for [user journey] in src/test/java/integration/[Name]IT.java
 
 ### Implementation for User Story 2
 
-- [ ] T023 [P] [US2] Create [Entity] in src/main/java/.../model/[Entity].java
-- [ ] T024 [US2] Implement [Service] in src/main/java/.../service/[Service].java
-- [ ] T025 [US2] Implement [endpoint/feature] in src/main/java/.../controller/[Controller].java
-- [ ] T026 [US2] Integrate with User Story 1 components (if needed)
+- [ ] T027 [P] [US2] Create [Entity] in src/main/java/.../model/[Entity].java
+- [ ] T028 [US2] Implement [Service] in src/main/java/.../service/[Service].java
+- [ ] T029 [US2] Implement [endpoint/feature] in src/main/java/.../controller/[Controller].java
+- [ ] T030 [US2] Integrate with User Story 1 components (if needed)
 
 **Checkpoint**: At this point, User Stories 1 AND 2 should both work independently
 
@@ -131,14 +153,14 @@ Examples of foundational tasks (adjust based on your project):
 
 ### Tests for User Story 3 (OPTIONAL - only if tests requested) ⚠️
 
-- [ ] T027 [P] [US3] Contract test for [endpoint] in src/test/java/contract/[Name]ContractTest.java
-- [ ] T028 [P] [US3] Integration test for [user journey] in src/test/java/integration/[Name]IT.java
+- [ ] T031 [P] [US3] Contract test for [endpoint] in src/test/java/contract/[Name]ContractTest.java
+- [ ] T032 [P] [US3] Integration test for [user journey] in src/test/java/integration/[Name]IT.java
 
 ### Implementation for User Story 3
 
-- [ ] T029 [P] [US3] Create [Entity] in src/main/java/.../model/[Entity].java
-- [ ] T030 [US3] Implement [Service] in src/main/java/.../service/[Service].java
-- [ ] T031 [US3] Implement [endpoint/feature] in src/main/java/.../controller/[Controller].java
+- [ ] T033 [P] [US3] Create [Entity] in src/main/java/.../model/[Entity].java
+- [ ] T034 [US3] Implement [Service] in src/main/java/.../service/[Service].java
+- [ ] T035 [US3] Implement [endpoint/feature] in src/main/java/.../controller/[Controller].java
 
 **Checkpoint**: All user stories should now be independently functional
 
@@ -153,11 +175,14 @@ Examples of foundational tasks (adjust based on your project):
 **Purpose**: Improvements that affect multiple user stories
 
 - [ ] TXXX [P] OpenAPI/Swagger documentation updates in source and docs/
+- [ ] TXXX [P] Frontend API integration verification against official endpoints only
+- [ ] TXXX [P] Frontend version/tag update using independent format (`vX.Y.Z-front`)
 - [ ] TXXX [P] Validate API versioning and pagination consistency across all endpoints
 - [ ] TXXX Code cleanup and refactoring
 - [ ] TXXX Performance optimization across all stories
 - [ ] TXXX [P] Additional unit tests (if requested) in src/test/java/unit/
-- [ ] TXXX Security hardening and Basic Auth regression checks
+- [ ] TXXX [P] Cypress E2E full-suite execution evidence attached to PR/build
+- [ ] TXXX Security hardening and auth/role regression checks
 - [ ] TXXX Confirm commit history is atomic and PR links all tasks/spec requirements
 - [ ] TXXX Run quickstart.md validation
 

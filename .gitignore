@@ -1,0 +1,38 @@
+# Java / Maven
+target/
+build/
+out/
+*.class
+*.jar
+*.war
+*.ear
+
+# Maven cache wrapper artifacts
+.mvn/wrapper/maven-wrapper.jar
+
+# Environment and logs
+.env*
+*.log
+
+# Frontend / Node
+node_modules/
+dist/
+coverage/
+frontend/node_modules/
+frontend/dist/
+frontend/.angular/
+frontend/.cache/
+
+# IDE / OS
+.vscode/
+.idea/
+.DS_Store
+Thumbs.db
+*.tmp
+*.swp
+
+# Docker local artifacts
+docker/.env
+media/
+__pycache__/
+.venv/

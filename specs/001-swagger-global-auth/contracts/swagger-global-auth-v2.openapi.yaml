@@ -1,0 +1,58 @@
+openapi: 3.0.3
+info:
+  title: API Empleados - Global Swagger Auth (v2)
+  version: 2.0.0
+  description: >-
+    Contrato de comportamiento para autenticacion centralizada en Swagger UI con
+    HTTP Basic global, sin cambio de version mayor.
+servers:
+  - url: http://localhost:8080
+
+security:
+  - basicAuth: []
+
+paths:
+  /v3/api-docs:
+    get:
+      summary: Obtener descriptor OpenAPI
+      description: >-
+        Endpoint de documentacion en modo lectura. No concede ejecucion de
+        operaciones protegidas sin autenticacion.
+      security: []
+      responses:
+        '200':
+          description: Documento OpenAPI disponible.
+
+  /api/v2/empleados:
+    get:
+      summary: Listar empleados (protegido)
+      description: Requiere credenciales HTTP Basic validas.
+      responses:
+        '200':
+          description: Operacion permitida con sesion autenticada valida.
+        '401':
+          description: Credencial invalida o expirada; Swagger debe exigir nuevo Authorize.
+
+  /api/v2/empleados/{clave}:
+    parameters:
+      - name: clave
+        in: path
+        required: true
+        schema:
+          type: string
+    get:
+      summary: Consultar empleado (protegido)
+      responses:
+        '200':
+          description: Operacion permitida con sesion autenticada valida.
+        '401':
+          description: Credencial invalida o expirada.
+
+components:
+  securitySchemes:
+    basicAuth:
+      type: http
+      scheme: basic
+      description: >-
+        Esquema global de autenticacion. Username = correo_electronico,
+        password = contrasena transitoria validada contra contrasena_hash.

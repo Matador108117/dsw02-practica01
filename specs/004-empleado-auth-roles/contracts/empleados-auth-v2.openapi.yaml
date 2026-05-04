@@ -1,0 +1,341 @@
+openapi: 3.0.3
+info:
+  title: API de Empleados con Auth y Roles
+  version: 2.0.0
+  description: >-
+    Contrato para autenticacion HTTP Basic obligatoria en endpoints protegidos,
+    usando `correo_electronico` como username y `contrasena` transitoria
+    validada por comparacion de hash con `contrasena_hash` persistido, con
+    autorizacion por roles y convivencia temporal de versiones v1 (deprecada)
+    y v2 (activa).
+servers:
+  - url: http://localhost:8080
+security:
+  - basicAuth: []
+tags:
+  - name: EmpleadosV1
+    description: Endpoints deprecados de empleados
+  - name: EmpleadosV2
+    description: Endpoints activos de empleados
+
+paths:
+  /api/v1/empleados:
+    get:
+      tags: [EmpleadosV1]
+      summary: Listar empleados (v1 deprecada)
+      deprecated: true
+      operationId: listarEmpleadosV1
+      description: >-
+        Endpoint temporalmente soportado. El sunset se calcula en UTC a los
+        90 dias naturales desde `release_v2_at_utc` (timestamp inmutable).
+      parameters:
+        - $ref: '#/components/parameters/Page'
+        - $ref: '#/components/parameters/Size'
+        - $ref: '#/components/parameters/Sort'
+      responses:
+        '200':
+          description: Lista paginada de empleados
+          headers:
+            Deprecation:
+              schema:
+                type: string
+                example: "true"
+            Sunset:
+              schema:
+                type: string
+                example: "2026-06-12T00:00:00Z"
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/EmpleadoPageResponse'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '423':
+          $ref: '#/components/responses/Locked'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+        '410':
+          $ref: '#/components/responses/Gone'
+
+  /api/v2/empleados:
+    get:
+      tags: [EmpleadosV2]
+      summary: Listar empleados (v2 activa)
+      operationId: listarEmpleadosV2
+      parameters:
+        - $ref: '#/components/parameters/Page'
+        - $ref: '#/components/parameters/Size'
+        - $ref: '#/components/parameters/Sort'
+      responses:
+        '200':
+          description: Lista paginada de empleados
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/EmpleadoPageResponse'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '423':
+          $ref: '#/components/responses/Locked'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+    post:
+      tags: [EmpleadosV2]
+      summary: Crear empleado
+      operationId: crearEmpleadoV2
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/EmpleadoCreateRequest'
+      responses:
+        '201':
+          description: Empleado creado
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/EmpleadoResponse'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '423':
+          $ref: '#/components/responses/Locked'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+        '409':
+          $ref: '#/components/responses/Conflict'
+
+  /api/v2/empleados/{clave}:
+    parameters:
+      - name: clave
+        in: path
+        required: true
+        schema:
+          type: string
+    get:
+      tags: [EmpleadosV2]
+      summary: Consultar empleado por clave
+      operationId: obtenerEmpleadoV2
+      responses:
+        '200':
+          description: Empleado encontrado
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/EmpleadoResponse'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '423':
+          $ref: '#/components/responses/Locked'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+        '404':
+          $ref: '#/components/responses/NotFound'
+    put:
+      tags: [EmpleadosV2]
+      summary: Actualizar empleado
+      operationId: actualizarEmpleadoV2
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/EmpleadoUpdateRequest'
+      responses:
+        '200':
+          description: Empleado actualizado
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/EmpleadoResponse'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '423':
+          $ref: '#/components/responses/Locked'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+        '404':
+          $ref: '#/components/responses/NotFound'
+    delete:
+      tags: [EmpleadosV2]
+      summary: Eliminar empleado
+      operationId: eliminarEmpleadoV2
+      responses:
+        '204':
+          description: Empleado eliminado
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '423':
+          $ref: '#/components/responses/Locked'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+        '404':
+          $ref: '#/components/responses/NotFound'
+
+components:
+  securitySchemes:
+    basicAuth:
+      type: http
+      scheme: basic
+      description: >-
+        Autenticacion HTTP Basic obligatoria en metodos protegidos.
+        Username = `correo_electronico`; password = `contrasena` transitoria,
+        verificada por comparacion de hash contra `contrasena_hash` persistido.
+
+  parameters:
+    Page:
+      name: page
+      in: query
+      schema:
+        type: integer
+        minimum: 0
+        default: 0
+    Size:
+      name: size
+      in: query
+      schema:
+        type: integer
+        minimum: 1
+        maximum: 100
+        default: 20
+    Sort:
+      name: sort
+      in: query
+      schema:
+        type: string
+        default: createdAt,desc
+
+  schemas:
+    EmpleadoCreateRequest:
+      type: object
+      properties:
+        nombre:
+          type: string
+          minLength: 1
+          maxLength: 100
+        direccion:
+          type: string
+          minLength: 1
+          maxLength: 100
+        telefono:
+          type: string
+          minLength: 1
+          maxLength: 100
+        correoElectronico:
+          type: string
+          format: email
+          maxLength: 150
+          description: Unicidad y comparacion de autenticacion insensible a mayusculas/minusculas.
+        contrasena:
+          type: string
+          minLength: 8
+          maxLength: 255
+        rol:
+          type: string
+          enum: [ADMIN, USER]
+      required: [nombre, direccion, telefono, correoElectronico, contrasena, rol]
+
+    EmpleadoUpdateRequest:
+      allOf:
+        - $ref: '#/components/schemas/EmpleadoCreateRequest'
+
+    EmpleadoResponse:
+      type: object
+      properties:
+        clave:
+          type: string
+        prefijo:
+          type: string
+        consecutivo:
+          type: integer
+          format: int64
+        nombre:
+          type: string
+        direccion:
+          type: string
+        telefono:
+          type: string
+        correoElectronico:
+          type: string
+          format: email
+        rol:
+          type: string
+          enum: [ADMIN, USER]
+        activo:
+          type: boolean
+      required: [clave, prefijo, consecutivo, nombre, direccion, telefono, correoElectronico, rol, activo]
+
+    EmpleadoPageResponse:
+      type: object
+      properties:
+        content:
+          type: array
+          items:
+            $ref: '#/components/schemas/EmpleadoResponse'
+        page:
+          type: integer
+        size:
+          type: integer
+        totalElements:
+          type: integer
+          format: int64
+        totalPages:
+          type: integer
+      required: [content, page, size, totalElements, totalPages]
+
+    ErrorResponse:
+      type: object
+      properties:
+        code:
+          type: string
+        message:
+          type: string
+      required: [code, message]
+
+  responses:
+    BadRequest:
+      description: Solicitud invalida
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/ErrorResponse'
+    Unauthorized:
+      description: Credenciales invalidas
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/ErrorResponse'
+    Locked:
+      description: Identidad temporalmente bloqueada por exceso de intentos fallidos
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/ErrorResponse'
+    Forbidden:
+      description: Rol sin permisos para la operacion
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/ErrorResponse'
+    NotFound:
+      description: Recurso no encontrado
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/ErrorResponse'
+    Conflict:
+      description: Conflicto de datos (correo duplicado)
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/ErrorResponse'
+    Gone:
+      description: Version API retirada por sunset; endpoint v1 no disponible
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/ErrorResponse'

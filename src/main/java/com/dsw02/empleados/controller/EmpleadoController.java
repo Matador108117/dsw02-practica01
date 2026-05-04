@@ -1,19 +1,9 @@
 package com.dsw02.empleados.controller;
 
-import com.dsw02.empleados.controller.dto.EmpleadoDtos.EmpleadoCreateRequest;
-import com.dsw02.empleados.controller.dto.EmpleadoDtos.EmpleadoResponse;
-import com.dsw02.empleados.controller.dto.EmpleadoDtos.EmpleadoUpdateRequest;
-import com.dsw02.empleados.service.EmpleadoService;
-import io.swagger.v3.oas.annotations.Operation;
-import io.swagger.v3.oas.annotations.media.ArraySchema;
-import io.swagger.v3.oas.annotations.media.Content;
-import io.swagger.v3.oas.annotations.media.Schema;
-import io.swagger.v3.oas.annotations.responses.ApiResponse;
-import io.swagger.v3.oas.annotations.security.SecurityRequirement;
-import jakarta.validation.Valid;
 import java.net.URI;
-import java.util.List;
+
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -21,10 +11,24 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
+import com.dsw02.empleados.controller.dto.EmpleadoDtos.EmpleadoCreateRequest;
+import com.dsw02.empleados.controller.dto.EmpleadoDtos.EmpleadoPageResponse;
+import com.dsw02.empleados.controller.dto.EmpleadoDtos.EmpleadoResponse;
+import com.dsw02.empleados.controller.dto.EmpleadoDtos.EmpleadoUpdateRequest;
+import com.dsw02.empleados.service.EmpleadoService;
+
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.media.Content;
+import io.swagger.v3.oas.annotations.media.Schema;
+import io.swagger.v3.oas.annotations.responses.ApiResponse;
+import io.swagger.v3.oas.annotations.security.SecurityRequirement;
+import jakarta.validation.Valid;
+
 @RestController
-@RequestMapping("/api/empleados")
+@RequestMapping("/api/v3/empleados")
 @SecurityRequirement(name = "basicAuth")
 public class EmpleadoController {
 
@@ -37,22 +41,28 @@ public class EmpleadoController {
     @Operation(summary = "Registrar empleado (clave autogenerada)")
     @ApiResponse(responseCode = "201", description = "Empleado creado", content = @Content(schema = @Schema(implementation = EmpleadoResponse.class)))
     @ApiResponse(responseCode = "400", description = "Error de validación")
+    @PreAuthorize("hasRole('ADMIN')")
     @PostMapping
     public ResponseEntity<EmpleadoResponse> create(@Valid @RequestBody EmpleadoCreateRequest request) {
         EmpleadoResponse response = service.create(request);
-        return ResponseEntity.created(URI.create("/api/empleados/" + response.clave())).body(response);
+        return ResponseEntity.created(URI.create("/api/v3/empleados/" + response.clave())).body(response);
     }
 
     @Operation(summary = "Listar empleados")
-    @ApiResponse(responseCode = "200", description = "Lista de empleados", content = @Content(array = @ArraySchema(schema = @Schema(implementation = EmpleadoResponse.class))))
+    @ApiResponse(responseCode = "200", description = "Lista paginada de empleados", content = @Content(schema = @Schema(implementation = EmpleadoPageResponse.class)))
+    @PreAuthorize("hasAnyRole('ADMIN','USER')")
     @GetMapping
-    public List<EmpleadoResponse> findAll() {
-        return service.findAll();
+    public EmpleadoPageResponse findAll(
+        @RequestParam(required = false) Integer page,
+        @RequestParam(required = false) Integer size
+    ) {
+        return service.findAll(page, size);
     }
 
     @Operation(summary = "Consultar empleado por clave compuesta")
     @ApiResponse(responseCode = "200", description = "Empleado encontrado", content = @Content(schema = @Schema(implementation = EmpleadoResponse.class)))
     @ApiResponse(responseCode = "404", description = "Empleado no encontrado")
+    @PreAuthorize("hasAnyRole('ADMIN','USER')")
     @GetMapping("/{clave}")
     public EmpleadoResponse findByClave(@PathVariable String clave) {
         return service.findByClave(clave);
@@ -61,6 +71,7 @@ public class EmpleadoController {
     @Operation(summary = "Actualizar empleado por clave compuesta")
     @ApiResponse(responseCode = "200", description = "Empleado actualizado", content = @Content(schema = @Schema(implementation = EmpleadoResponse.class)))
     @ApiResponse(responseCode = "404", description = "Empleado no encontrado")
+    @PreAuthorize("hasRole('ADMIN')")
     @PutMapping("/{clave}")
     public EmpleadoResponse update(@PathVariable String clave, @Valid @RequestBody EmpleadoUpdateRequest request) {
         return service.update(clave, request);
@@ -69,6 +80,7 @@ public class EmpleadoController {
     @Operation(summary = "Eliminar empleado por clave compuesta")
     @ApiResponse(responseCode = "204", description = "Empleado eliminado")
     @ApiResponse(responseCode = "404", description = "Empleado no encontrado")
+    @PreAuthorize("hasRole('ADMIN')")
     @DeleteMapping("/{clave}")
     public ResponseEntity<Void> delete(@PathVariable String clave) {
         service.delete(clave);

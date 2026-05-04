@@ -1,15 +1,15 @@
 package com.dsw02.empleados.service;
 
 import com.dsw02.empleados.controller.dto.EmpleadoDtos.EmpleadoCreateRequest;
+import com.dsw02.empleados.controller.dto.EmpleadoDtos.EmpleadoPageResponse;
 import com.dsw02.empleados.controller.dto.EmpleadoDtos.EmpleadoResponse;
 import com.dsw02.empleados.controller.dto.EmpleadoDtos.EmpleadoUpdateRequest;
-import java.util.List;
 
 public interface EmpleadoService {
 
     EmpleadoResponse create(EmpleadoCreateRequest request);
 
-    List<EmpleadoResponse> findAll();
+    EmpleadoPageResponse findAll(Integer page, Integer size);
 
     EmpleadoResponse findByClave(String clave);
 

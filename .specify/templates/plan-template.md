@@ -18,14 +18,23 @@
 -->
 
 **Language/Version**: Java 17  
-**Primary Dependencies**: Spring Boot 3, Spring Security, Spring Data JPA, springdoc-openapi  
+**Primary Dependencies**: Spring Boot 3, Spring Security, Spring Data JPA, springdoc-openapi, Angular 22 LTS, Cypress  
 **Storage**: PostgreSQL (Docker-managed in local and CI)  
-**Testing**: JUnit 5, Spring Boot Test, MockMvc/Testcontainers when applicable  
+**Testing**: JUnit 5, Spring Boot Test, MockMvc/Testcontainers, Cypress E2E  
 **Target Platform**: Linux server
-**Project Type**: backend web-service  
+**Project Type**: backend + official frontend web system  
 **Performance Goals**: Define per feature (must include measurable latency/throughput target)  
-**Constraints**: HTTP Basic Auth, OpenAPI/Swagger required, Docker parity for DB,
-API major versioning (`/api/v{major}`), paginated list endpoints, feature-branch + PR workflow  
+**Constraints**: Mandatory HTTP Basic auth (`type=http`, `scheme=basic`) on API
+methods using `correo_electronico` as username and transient `contrasena`
+validated against persisted `contrasena_hash`, role-based access (`USER`
+read-only, `ADMIN` CRUD), OpenAPI/Swagger required, Docker parity for DB,
+API major versioning (`/api/v{major}`), mandatory major bump when public contract
+changes or new public endpoints are introduced, paginated list endpoints,
+explicit FK-backed relational integrity for `Departamento (1) -> (N) Empleados`
+with nullable employee assignment, official frontend stack (Angular 22 LTS +
+TypeScript + nvm), frontend Docker + existing Compose integration, Cypress E2E
+gate for login success/failure + employee/department rendering + CRUD, frontend
+versioning independent from backend, feature-branch + PR workflow  
 **Scale/Scope**: Define per feature with expected API and data volume
 
 ## Constitution Check
@@ -33,12 +42,34 @@ API major versioning (`/api/v{major}`), paginated list endpoints, feature-branch
 *GATE: Must pass before Phase 0 research. Re-check after Phase 1 design.*
 
 - Stack gate: Plan uses Spring Boot 3 + Java 17 only.
-- Security gate: Protected endpoints include HTTP Basic Auth design and test strategy.
+- Security gate: Protected endpoints include mandatory HTTP Basic auth (`type=http`,
+  `scheme=basic`) with `correo_electronico` username mapping, transient password
+  verification against persisted hash, plus role policy (`USER` read-only,
+  `ADMIN` CRUD) design and test strategy.
 - Data gate: PostgreSQL schema/data changes and Docker runtime impact are documented.
+- Employee data gate: Any feature touching `empleado` persistence documents and
+  enforces required `correo_electronico` and `contrasena_hash` attributes, while
+  keeping `contrasena` as input-only and not persisted in plaintext.
 - Contract gate: OpenAPI changes and Swagger evidence are explicitly listed.
-- Quality gate: Integration tests for auth, DB, and API contract are planned.
+- Quality gate: Integration tests for auth, role authorization, DB, and API contract
+  are planned.
+- Frontend platform gate: Official frontend uses Angular 22 LTS + TypeScript,
+  Node version management through nvm, and integrates with the existing Docker
+  Compose topology.
+- Frontend integration gate: Frontend consumes only official API endpoints,
+  delegates authentication to API flows, and does not duplicate domain logic.
+- Frontend E2E gate: Cypress scenarios for login success, login failure,
+  employee rendering, department rendering, and CRUD are planned and blocking.
 - Versioning gate: API path version impact is documented (`/api/v{major}`) and
   breaking changes include migration notes.
+- Frontend version gate: Frontend release version impact is documented separately
+  from backend API versioning.
+- Contract evolution gate: Public contract expansion or new endpoints explicitly
+  trigger major version increment (for Department-domain rollout: `v3` or newer).
+- Relational integrity gate: Features touching Department-Employee relation define
+  explicit FK rules and nullable employee assignment semantics.
+- Sunset gate: Deprecated version cutoff behavior is documented and enforces
+  `410 Gone` using UTC as business clock.
 - Pagination gate: List endpoints define defaults, max limits, and validation tests.
 - Workflow gate: Branch strategy, atomic commits, and PR traceability to spec/tasks
   are explicitly documented.
@@ -81,6 +112,11 @@ src/test/java/
 ├── unit/
 ├── integration/
 └── contract/
+
+frontend/
+├── src/
+├── cypress/
+└── package.json
 
 docker/
 └── docker-compose.yml

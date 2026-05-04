@@ -1,0 +1,36 @@
+:root {
+  color-scheme: dark;
+  --rog-bg-0: #070709;
+  --rog-bg-1: #101116;
+  --rog-panel: #151722;
+  --rog-panel-soft: #1a1d2a;
+  --rog-line: rgba(255, 255, 255, 0.14);
+  --rog-text: #f2f5ff;
+  --rog-muted: #aeb7d3;
+  --rog-red: #ff1f4b;
+  --rog-red-strong: #ff0038;
+}
+
+@import url('https://fonts.googleapis.com/css2?family=Rajdhani:wght@500;600;700&family=Orbitron:wght@500;600;700&display=swap');
+
+* {
+  box-sizing: border-box;
+}
+
+html,
+body {
+  width: 100%;
+  max-width: 100%;
+  overflow-x: hidden;
+}
+
+body {
+  margin: 0;
+  font-family: 'Rajdhani', 'Segoe UI', sans-serif;
+  color: var(--rog-text);
+  background:
+    linear-gradient(118deg, rgba(255, 0, 56, 0.11) 0%, rgba(255, 0, 56, 0) 42%),
+    radial-gradient(circle at 15% 84%, rgba(255, 31, 75, 0.16) 0%, rgba(255, 31, 75, 0) 34%),
+    radial-gradient(circle at 88% 12%, rgba(73, 84, 125, 0.28) 0%, rgba(73, 84, 125, 0) 38%),
+    linear-gradient(160deg, var(--rog-bg-0) 0%, var(--rog-bg-1) 100%);
+}

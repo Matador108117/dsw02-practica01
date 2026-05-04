@@ -1,0 +1,115 @@
+package com.dsw02.empleados.service;
+
+import java.time.OffsetDateTime;
+import java.time.temporal.ChronoUnit;
+import java.util.Optional;
+
+import org.springframework.beans.factory.annotation.Value;
+import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
+
+import com.dsw02.empleados.model.ApiVersionSupportPolicy;
+import com.dsw02.empleados.repository.ApiVersionSupportPolicyRepository;
+
+/**
+ * Service for managing API version support policies.
+ * Enforces v1 deprecation and sunset with UTC-based time enforcement.
+ */
+@Service
+@Transactional
+public class ApiVersionSupportPolicyService {
+
+    private final ApiVersionSupportPolicyRepository policyRepository;
+
+    @Value("${app.api-version.sunset-v1-utc:2026-06-12T00:00:00Z}")
+    private String configuredSunsetV1Utc;
+
+    public ApiVersionSupportPolicyService(ApiVersionSupportPolicyRepository policyRepository) {
+        this.policyRepository = policyRepository;
+    }
+
+    /**
+     * Find version policy by API name.
+     *
+     * @param apiName the API name (e.g., "empleados")
+     * @return Optional containing the policy if found
+     */
+    public Optional<ApiVersionSupportPolicy> findByApiName(String apiName) {
+        return policyRepository.findByApiName(apiName);
+    }
+
+    /**
+     * Check if a version is currently sunsetted.
+     * A version is sunsetted if current UTC time >= sunset_at_utc.
+     *
+     * @param apiName the API name
+     * @return true if version is sunsetted, false if still in deprecation window
+     */
+    public boolean isVersionSunset(String apiName) {
+        OffsetDateTime now = OffsetDateTime.now();
+
+        try {
+            if (!now.isBefore(OffsetDateTime.parse(configuredSunsetV1Utc))) {
+                return true;
+            }
+        } catch (Exception ignored) {
+            // If configured value is malformed, fallback to DB policy.
+        }
+
+        return findByApiName(apiName)
+            .map(policy -> policy.isVersionSunset(now))
+            .orElse(false);
+    }
+
+    /**
+     * Get remaining time until sunset in seconds.
+     * Returns 0 if already sunsetted, negative if past sunset.
+     *
+     * @param apiName the API name
+     * @return seconds remaining, or -1 if policy not found
+     */
+    public long getSecondsUntilSunset(String apiName) {
+        return findByApiName(apiName)
+            .map(policy -> {
+                long secondsRemaining = ChronoUnit.SECONDS.between(
+                    OffsetDateTime.now(),
+                    policy.getSunsetAtUtc()
+                );
+                return Math.max(0, secondsRemaining);
+            })
+            .orElse(-1L);
+    }
+
+    /**
+     * Initialize default policy for empleados API if not exists.
+     * Called during application startup to ensure policy is available.
+     */
+    public void initializeDefaultPolicyIfNeeded(
+            String apiName,
+            String deprecatedVersion,
+            String activeVersion,
+            OffsetDateTime releaseV2AtUtc,
+            OffsetDateTime sunsetAtUtc) {
+        Optional<ApiVersionSupportPolicy> existing = policyRepository.findByApiName(apiName);
+        if (existing.isEmpty()) {
+            ApiVersionSupportPolicy policy = new ApiVersionSupportPolicy(
+                apiName,
+                deprecatedVersion,
+                activeVersion,
+                releaseV2AtUtc,
+                sunsetAtUtc
+            );
+            policy.setDeprecationNotice("Version " + deprecatedVersion + " deprecated as of " + releaseV2AtUtc + ", will be removed on " + sunsetAtUtc);
+            policyRepository.save(policy);
+            return;
+        }
+
+        ApiVersionSupportPolicy policy = existing.get();
+        policy.setDeprecatedVersion(deprecatedVersion);
+        policy.setActiveVersion(activeVersion);
+        policy.setReleaseV2AtUtc(releaseV2AtUtc);
+        policy.setSunsetAtUtc(sunsetAtUtc);
+        policy.setDeprecationNotice("Version " + deprecatedVersion + " deprecated as of " + releaseV2AtUtc + ", will be removed on " + sunsetAtUtc);
+        policyRepository.save(policy);
+    }
+}

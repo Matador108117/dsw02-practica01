@@ -12,14 +12,23 @@ spring:
     properties:
       hibernate:
         format_sql: true
+        jdbc:
+          time_zone: UTC
   flyway:
     enabled: true
+    locations: classpath:db/migration
   jackson:
     deserialization:
       fail-on-unknown-properties: true
+    time-zone: UTC
 
 server:
   port: 8080
+  servlet:
+    encoding:
+      charset: UTF-8
+      enabled: true
+      force: true
 
 springdoc:
   api-docs:
@@ -27,10 +36,35 @@ springdoc:
   swagger-ui:
     path: /swagger-ui/index.html
 
+management:
+  endpoints:
+    web:
+      exposure:
+        include: health,info
+  endpoint:
+    health:
+      probes:
+        enabled: true
+
 app:
-  security:
-    username: ${APP_USER:admin}
-    password: ${APP_PASSWORD:admin123}
+  bootstrap-admin:
+    email: ${APP_BOOTSTRAP_ADMIN_EMAIL:admin@empresa.com}
+    password: ${APP_BOOTSTRAP_ADMIN_PASSWORD:Admin123!}
+    only-once: true
+  bootstrap-test-user:
+    nombre: ${APP_TEST_USER_NAME:prueba2}
+    email: ${APP_TEST_USER_EMAIL:emailprueba@gmail.com}
+    password: ${APP_TEST_USER_PASSWORD:contra123}
+    rol: ${APP_TEST_USER_ROLE:USER}
+  api-version:
+    release-v2-utc: ${API_RELEASE_V2_UTC:2026-03-14T00:00:00Z}
+    sunset-v1-utc: ${API_SUNSET_V1_UTC:2026-06-12T00:00:00Z}
+  auth:
+    jwt-secret: ${APP_AUTH_JWT_SECRET:0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef}
+    issuer: ${APP_AUTH_ISSUER:dsw02-empleados}
+    access-token-seconds: ${APP_AUTH_ACCESS_SECONDS:1800}
+    refresh-token-seconds: ${APP_AUTH_REFRESH_SECONDS:43200}
+    secure-cookies: ${APP_AUTH_SECURE_COOKIES:false}
 
 logging:
   level:
