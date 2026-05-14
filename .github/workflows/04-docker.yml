@@ -1,14 +1,11 @@
 name: 04-docker
 
 on:
-  
-  merge_group:
-      types: [checks_requested]
-      branches:
-        - master
-  workflow_run: 
-    workflows: ["03-Cypress"]
-    types: [completed]
+  workflow_run:
+    workflows:
+      - "03-Cypress"
+    types:
+      - completed
 
 env:
   IMAGE_NAME_BACKEND: ${{ secrets.DOCKERHUB_USERNAME }}/${{ github.event.repository.name }}
@@ -16,20 +13,53 @@ env:
 
 jobs:
   build-and-push:
+    runs-on: ubuntu-latest
+
     if: >-
       ${{
         github.event.workflow_run.conclusion == 'success' &&
-        github.event.workflow_run.event == 'pull_request' &&
-        github.event.workflow_run.pull_requests &&
-        github.event.workflow_run.pull_requests[0].base.ref == 'develop' &&
-        github.event.workflow_run.pull_requests[0].head.ref == 'master'
+        github.event.workflow_run.event == 'pull_request'
       }}
-    runs-on: ubuntu-latest
 
     permissions:
       contents: read
 
     steps:
+      - name: Debug event
+        run: |
+          echo "Conclusion: ${{ github.event.workflow_run.conclusion }}"
+          echo "Event: ${{ github.event.workflow_run.event }}"
+          echo "Head branch: ${{ github.event.workflow_run.head_branch }}"
+
+      - name: Validate merge develop -> master
+        run: |
+          PR_DATA='${{ toJson(github.event.workflow_run.pull_requests) }}'
+
+          echo "$PR_DATA"
+
+          BASE=$(echo "$PR_DATA" | jq -r '.[0].base.ref')
+          HEAD=$(echo "$PR_DATA" | jq -r '.[0].head.ref')
+          MERGED=$(echo "$PR_DATA" | jq -r '.[0].merged')
+
+          echo "BASE=$BASE"
+          echo "HEAD=$HEAD"
+          echo "MERGED=$MERGED"
+
+          if [[ "$BASE" != "master" ]]; then
+            echo "Not targeting master"
+            exit 1
+          fi
+
+          if [[ "$HEAD" != "develop" ]]; then
+            echo "Not coming from develop"
+            exit 1
+          fi
+
+          if [[ "$MERGED" != "true" ]]; then
+            echo "PR was not merged"
+            exit 1
+          fi
+
       - name: Checkout
         uses: actions/checkout@v4
 
@@ -40,12 +70,7 @@ jobs:
           java-version: "17"
           cache: maven
 
-      - name: Install Maven
-        run: |
-          sudo apt-get update
-          sudo apt-get install -y maven
-
-      - name: Run backend unit and integration tests
+      - name: Run backend tests
         run: mvn -B -ntp verify
 
       - name: Set up Node.js
@@ -59,7 +84,7 @@ jobs:
         run: npm ci
         working-directory: frontend
 
-      - name: Run frontend unit tests
+      - name: Run frontend tests
         run: npm run test
         working-directory: frontend
 
