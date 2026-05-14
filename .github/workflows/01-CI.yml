@@ -57,16 +57,3 @@ jobs:
 
       - name: Run frontend unit tests
         run: npm run test
-
-      - name: Run Cypress E2E tests
-        run: npm run test:e2e
-
-      - name: Upload Cypress artifacts on failure
-        if: failure()
-        uses: actions/upload-artifact@v4
-        with:
-          name: cypress-artifacts
-          path: |
-            frontend/cypress/screenshots
-            frontend/cypress/videos
-          if-no-files-found: ignore

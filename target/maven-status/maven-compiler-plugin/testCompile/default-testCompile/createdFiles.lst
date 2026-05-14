@@ -2,8 +2,8 @@ com/dsw02/empleados/integration/EmpleadoReadIntegrationIT.class
 com/dsw02/empleados/integration/DepartamentoCrudIntegrationIT.class
 com/dsw02/empleados/integration/BasicAuthUsernameMappingIntegrationIT.class
 com/dsw02/empleados/contract/PaginationDefaultsContractIT.class
-com/dsw02/empleados/service/ApiVersionSupportPolicyServiceTest.class
 com/dsw02/empleados/performance/DepartamentoListPerformanceIT.class
+com/dsw02/empleados/service/ApiVersionSupportPolicyServiceTest.class
 com/dsw02/empleados/performance/DepartamentoEmpleadosPerformanceIT.class
 com/dsw02/empleados/integration/FlywayDepartamentosMigrationIT.class
 com/dsw02/empleados/integration/SecurityCrudIntegrationIT.class
@@ -16,8 +16,8 @@ com/dsw02/empleados/integration/EmpleadoPersistenceConstraintsIT.class
 com/dsw02/empleados/integration/EmpleadoUpdateDeleteIntegrationIT.class
 com/dsw02/empleados/integration/BasePostgresIT.class
 com/dsw02/empleados/integration/OperabilityLoggingIntegrationIT.class
-com/dsw02/empleados/integration/DepartamentoEmpleadosEndpointIT.class
 com/dsw02/empleados/integration/ApiVersionSunsetIntegrationIT.class
+com/dsw02/empleados/integration/DepartamentoEmpleadosEndpointIT.class
 com/dsw02/empleados/contract/DepartamentoEmpleadosContractIT.class
 com/dsw02/empleados/integration/BasicAuthHashValidationIntegrationIT.class
 com/dsw02/empleados/performance/AuthLoginPerformanceIT.class
