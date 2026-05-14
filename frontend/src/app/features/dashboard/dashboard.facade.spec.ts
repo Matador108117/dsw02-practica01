@@ -1,11 +1,12 @@
 import { describe, expect, it } from 'vitest';
-import { DashboardFacade } from '@features/dashboard/dashboard.facade';
+import { DashboardFacade } from './dashboard.facade';
 
-describe('frontend logic boundary', () => {
-  it('keeps write permissions gated by role only', () => {
+describe('DashboardFacade', () => {
+  it('allows write actions only for admin role', () => {
     const facade = new DashboardFacade();
 
     expect(facade.canWrite()).toBe(false);
+
     facade.setRole('ADMIN');
     expect(facade.canWrite()).toBe(true);
   });
