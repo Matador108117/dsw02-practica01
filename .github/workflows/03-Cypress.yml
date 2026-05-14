@@ -1,6 +1,12 @@
 name: 03-Cypress
 
 on:
+  push:
+    branches:
+      - develop
+  pull_request:
+    branches:
+      - master
   workflow_run:
     workflows: ["02-Sonar"]
     types: [completed]

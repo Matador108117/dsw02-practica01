@@ -1,5 +1,11 @@
 name: 02-Sonar
 on:
+  push:
+    branches:
+      - develop
+  pull_request:
+    branches:
+      - master
   workflow_run:
     workflows: ["01-CI"]
     types: [completed]
