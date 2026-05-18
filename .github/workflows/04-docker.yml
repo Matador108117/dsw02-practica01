@@ -1,11 +1,9 @@
 name: 04-docker
 
 on:
-  workflow_run:
-    workflows:
-      - "03-Cypress"
-    types:
-      - completed
+  push:
+    branches:
+      - master
 
 env:
   IMAGE_NAME_BACKEND: ${{ secrets.DOCKERHUB_USERNAME }}/${{ github.event.repository.name }}
@@ -15,51 +13,10 @@ jobs:
   build-and-push:
     runs-on: ubuntu-latest
 
-    if: >-
-      ${{
-        github.event.workflow_run.conclusion == 'success' &&
-        github.event.workflow_run.event == 'pull_request'
-      }}
-
     permissions:
       contents: read
 
     steps:
-      - name: Debug event
-        run: |
-          echo "Conclusion: ${{ github.event.workflow_run.conclusion }}"
-          echo "Event: ${{ github.event.workflow_run.event }}"
-          echo "Head branch: ${{ github.event.workflow_run.head_branch }}"
-
-      - name: Validate merge develop -> master
-        run: |
-          PR_DATA='${{ toJson(github.event.workflow_run.pull_requests) }}'
-
-          echo "$PR_DATA"
-
-          BASE=$(echo "$PR_DATA" | jq -r '.[0].base.ref')
-          HEAD=$(echo "$PR_DATA" | jq -r '.[0].head.ref')
-          MERGED=$(echo "$PR_DATA" | jq -r '.[0].merged')
-
-          echo "BASE=$BASE"
-          echo "HEAD=$HEAD"
-          echo "MERGED=$MERGED"
-
-          if [[ "$BASE" != "master" ]]; then
-            echo "Not targeting master"
-            exit 1
-          fi
-
-          if [[ "$HEAD" != "develop" ]]; then
-            echo "Not coming from develop"
-            exit 1
-          fi
-
-          if [[ "$MERGED" != "true" ]]; then
-            echo "PR was not merged"
-            exit 1
-          fi
-
       - name: Checkout
         uses: actions/checkout@v4
 
@@ -103,7 +60,9 @@ jobs:
           context: .
           file: ./Dockerfile
           push: true
-          tags: ${{ env.IMAGE_NAME_BACKEND }}:${{ github.sha }}
+          tags: |
+            ${{ env.IMAGE_NAME_BACKEND }}:latest
+            ${{ env.IMAGE_NAME_BACKEND }}:${{ github.sha }}
 
       - name: Build and push frontend image
         uses: docker/build-push-action@v5
@@ -111,4 +70,6 @@ jobs:
           context: ./frontend
           file: ./frontend/Dockerfile
           push: true
-          tags: ${{ env.IMAGE_NAME_FRONTEND }}:${{ github.sha }}
+          tags: |
+            ${{ env.IMAGE_NAME_FRONTEND }}:latest
+            ${{ env.IMAGE_NAME_FRONTEND }}:${{ github.sha }}
